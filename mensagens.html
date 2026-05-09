@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Mensagens — FAI303306</title>
+<link rel="stylesheet" href="assets/css/rcp-core.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+.msg-toolbar {
+  position: sticky; top: 0; z-index: 200;
+  background: var(--c-primary); color: #fff;
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px;
+}
+.msg-toolbar h1 { font-size: 1rem; font-weight: 600; flex: 1; }
+.btn-back { background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; padding: 4px 8px; }
+
+.section-label {
+  font-size: .78rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .06em; color: var(--c-muted);
+  padding: 12px 16px 4px;
+  display: flex; align-items: center; gap: 6px;
+}
+
+.contact-block { margin: 0 16px 16px; }
+.contact-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius) var(--radius) 0 0;
+  color: #fff; font-weight: 600; font-size: .9rem;
+}
+.contact-header .contact-meta { font-size: .73rem; opacity: .85; font-weight: 400; margin-top: 1px; }
+.contact-header.wa       { background: #128C7E; }
+.contact-header.email    { background: var(--c-primary); }
+.contact-header.addvalora{ background: #b71c1c; }
+
+.tpl-card {
+  background: var(--c-surface); border: 1px solid var(--c-border);
+  border-top: none; padding: 14px;
+}
+.tpl-card:last-child { border-radius: 0 0 var(--radius) var(--radius); }
+.tpl-label {
+  font-size: .72rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .05em; color: var(--c-muted); margin-bottom: 8px;
+}
+.tpl-body {
+  background: var(--c-bg); border: 1px solid var(--c-border);
+  border-radius: 8px; padding: 12px;
+  font-size: .82rem; line-height: 1.65; color: var(--c-text);
+  white-space: pre-wrap; word-break: break-word;
+}
+.tpl-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+
+.btn-tpl {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 7px 14px; border-radius: 6px;
+  font-size: .8rem; cursor: pointer; font-weight: 600;
+  border: 1.5px solid transparent; transition: opacity .15s;
+}
+.btn-tpl:hover { opacity: .85; }
+.btn-tpl.copy    { border-color: var(--c-border); background: var(--c-bg); color: var(--c-text); font-weight: 400; }
+.btn-tpl.wa      { background: #128C7E; color: #fff; }
+.btn-tpl.email   { background: var(--c-primary); color: #fff; }
+.btn-tpl.addvalora{ background: #b71c1c; color: #fff; }
+
+.toast {
+  position: fixed;
+  bottom: calc(var(--nav-h) + var(--safe-b) + 16px);
+  left: 50%; transform: translateX(-50%) translateY(20px);
+  background: #1a1a1a; color: #fff;
+  padding: 9px 18px; border-radius: 20px;
+  font-size: .83rem; z-index: 9999;
+  opacity: 0; transition: all .28s; pointer-events: none;
+  white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+.page-content { padding-bottom: calc(var(--nav-h) + var(--safe-b) + 16px); }
+@media(min-width:1100px){ .page-content { padding-bottom: 24px; } }
+</style>
+</head>
+<body>
+
+<div class="msg-toolbar">
+  <button class="btn-back" onclick="history.back()" aria-label="Voltar"><i class="fa fa-arrow-left"></i></button>
+  <h1><i class="fa fa-comment-dots" style="margin-right:6px;opacity:.8"></i>Mensagens — FAI303306</h1>
+</div>
+
+<div class="page-content">
+
+  <!-- ─── WhatsApp ──────────────────────────────────── -->
+  <div class="section-label"><i class="fa fa-whatsapp" style="color:#128C7E"></i> WhatsApp</div>
+
+  <!-- Segurado -->
+  <div class="contact-block">
+    <div class="contact-header wa">
+      <i class="fa fa-user-doctor fa-lg"></i>
+      <div>
+        Dr. Raymundo Nonato A. Junior
+        <div class="contact-meta"><i class="fa fa-phone"></i> WhatsApp — Segurado</div>
+      </div>
+    </div>
+
+    <div class="tpl-card">
+      <div class="tpl-label">Solicitação de Prontuário (Urgente)</div>
+      <div class="tpl-body" id="wa1">Dr. Raymundo, boa tarde!
+
+Sou Marcelo da Mar Del Plata Seguros. Precisamos com *urgência* do prontuário médico completo referente ao caso da paciente Suzana Gonçalves Ferraz (cirurgia bariátrica de 12/11/2024) para encaminhar à reguladora Addvalora no sinistro *FAI303306*.
+
+Pode nos enviar aqui em PDF? Qualquer dúvida estou à disposição.</div>
+      <div class="tpl-actions">
+        <button class="btn-tpl copy" onclick="copiar('wa1')"><i class="fa fa-copy"></i> Copiar</button>
+        <button class="btn-tpl wa"   onclick="abrirWA('wa1')"><i class="fa fa-whatsapp"></i> Abrir WA</button>
+      </div>
+    </div>
+
+    <div class="tpl-card">
+      <div class="tpl-label">Atualização Pós-Audiência</div>
+      <div class="tpl-body" id="wa2">Dr. Raymundo, boa tarde!
+
+Estava verificando o andamento do seu processo (Proc. 0012345-67.2025.8.26.0100, 15ª Vara Cível) e vi que a audiência estava marcada para 07/05/2026.
+
+Poderia nos informar como foi? Houve alguma decisão ou nova data designada? Essas informações são importantes para atualizarmos o sinistro *FAI303306* com a Fairfax.
+
+Obrigado!</div>
+      <div class="tpl-actions">
+        <button class="btn-tpl copy" onclick="copiar('wa2')"><i class="fa fa-copy"></i> Copiar</button>
+        <button class="btn-tpl wa"   onclick="abrirWA('wa2')"><i class="fa fa-whatsapp"></i> Abrir WA</button>
+      </div>
+    </div>
+
+    <div class="tpl-card">
+      <div class="tpl-label">Itens Condicionais (2.3 / 2.5 / 2.6 / 2.8)</div>
+      <div class="tpl-body" id="wa3">Dr. Raymundo, tudo bem?
+
+Para completar a documentação do sinistro *FAI303306*, precisamos saber se os itens abaixo se aplicam:
+
+✅ Houve *consentimento informado* assinado pela paciente? (Item 2.3)
+✅ Houve *notificação ao CRM* ou conselho de saúde? (Item 2.5)
+✅ Existe *laudo de perito nomeado* por juízo? (Item 2.6)
+✅ O *seguro RC do Hospital* está envolvido? (Item 2.8)
+
+Para cada item: responda *Sim* ou *Não*. Se Sim, precisaremos do documento. Obrigado!</div>
+      <div class="tpl-actions">
+        <button class="btn-tpl copy" onclick="copiar('wa3')"><i class="fa fa-copy"></i> Copiar</button>
+        <button class="btn-tpl wa"   onclick="abrirWA('wa3')"><i class="fa fa-whatsapp"></i> Abrir WA</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Advogado -->
+  <div class="contact-block">
+    <div class="contact-header wa">
+      <i class="fa fa-scale-balanced fa-lg"></i>
+      <div>
+        Cândido & Henrique Advogados
+        <div class="contact-meta"><i class="fa fa-phone"></i> WhatsApp — Defesa</div>
+      </div>
+    </div>
+
+    <div class="tpl-card">
+      <div class="tpl-label">Pós-Audiência — Atualização de Status</div>
+      <div class="tpl-body" id="wa4">Bom dia, Cândido & Henrique!
+
+Da Mar Del Plata Seguros, referente ao sinistro *FAI303306* — Dr. Raymundo Nonato (15ª Vara Cível, Proc. 0012345-67.2025.8.26.0100).
+
+Verificamos que a audiência de 07/05/2026 ocorreu. Poderiam nos informar:
+1️⃣ Houve decisão judicial?
+2️⃣ Nova data foi designada?
+3️⃣ Precisam de suporte documental urgente da seguradora?
+
+Aguardamos retorno. Obrigado!</div>
+      <div class="tpl-actions">
+        <button class="btn-tpl copy" onclick="copiar('wa4')"><i class="fa fa-copy"></i> Copiar</button>
+        <button class="btn-tpl wa"   onclick="abrirWA('wa4')"><i class="fa fa-whatsapp"></i> Abrir WA</button>
+      </div>
+    </div>
+
+    <div class="tpl-card">
+      <div class="tpl-label">Solicitação de Peças Processuais</div>
+      <div class="tpl-body" id="wa5">Boa tarde, Cândido & Henrique!
+
+Sinistro *FAI303306* — Dr. Raymundo Nonato. Precisamos para o arquivo da reguladora:
+
+📄 Petição inicial da reclamante
+📄 Contestação apresentada pela defesa
+📄 Despachos relevantes do processo
+
+Poderiam encaminhar em PDF? Aguardamos. Obrigado!</div>
+      <div class="tpl-actions">
+        <button class="btn-tpl copy" onclick="copiar('wa5')"><i class="fa fa-copy"></i> Copiar</button>
+        <button class="btn-tpl wa"   onclick="abrirWA('wa5')"><i class="fa fa-whatsapp"></i> Abrir WA</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── E-mail ──────────────────────────────────────── -->
+  <div class="section-label"><i class="fa fa-envelope" style="color:var(--c-primary)"></i> E-mail</div>
+
+  <!-- Addvalora -->
+  <div class="contact-block">
+    <div class="contact-header addvalora">
+      <i class="fa fa-building fa-lg"></i>
+      <div>
+        Addvalora — Aline R. Lonardoni
+        <div class="contact-meta"><i class="fa fa-envelope"></i> alonardoni@addvaloraglobal.com</div>
+      </div>
+    </div>
+
+    <div class="tpl-card">
+      <div class="tpl-label">Encaminhamento Inicial de Documentos</div>
+      <div class="tpl-body" id="email1">Assunto: Sinistro FAI303306 — Dr. Raymundo Nonato — Documentação Inicial
+
+Prezada Aline,
+
+Segue documentação inicial referente ao sinistro FAI303306, segurado Dr. Raymundo Nonato Almeida Junior:
+
+• Aviso de Sinistro RCP (em anexo)
+• Declaração Addvalora assinada (em anexo)
+• Notificação/Citação judicial (em anexo)
+
+Estamos em coleta dos documentos restantes. O prontuário médico (item 2.10) está sendo solicitado ao segurado com urgência.
+
+Atenciosamente,
+Marcelo Brandão
+Mar Del Plata Corretora de Seguros
+SUSEP 202031070</div>
+      <div class="tpl-actions">
+        <button class="btn-tpl copy"      onclick="copiar('email1')"><i class="fa fa-copy"></i> Copiar</button>
+        <button class="btn-tpl addvalora" onclick="abrirEmail('alonardoni@addvaloraglobal.com','Sinistro FAI303306 — Dr. Raymundo Nonato — Documentação Inicial','email1')">
+          <i class="fa fa-envelope"></i> Abrir E-mail
+        </button>
+      </div>
+    </div>
+
+    <div class="tpl-card">
+      <div class="tpl-label">Itens Condicionais — Não Aplicável</div>
+      <div class="tpl-body" id="email2">Assunto: Sinistro FAI303306 — Itens Condicionais — Não Aplicável
+
+Prezada Aline,
+
+Em complemento à documentação enviada, informamos que os seguintes itens não se aplicam ao caso:
+
+• Item [NÚMERO]: [MOTIVO — ex: Não houve laudo de perito judicial até a presente data]
+
+Os demais itens estão em coleta conforme comunicado anterior.
+
+Atenciosamente,
+Marcelo Brandão
+Mar Del Plata Corretora de Seguros
+SUSEP 202031070</div>
+      <div class="tpl-actions">
+        <button class="btn-tpl copy"      onclick="copiar('email2')"><i class="fa fa-copy"></i> Copiar</button>
+        <button class="btn-tpl addvalora" onclick="abrirEmail('alonardoni@addvaloraglobal.com','Sinistro FAI303306 — Itens Condicionais — Não Aplicável','email2')">
+          <i class="fa fa-envelope"></i> Abrir E-mail
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fairfax -->
+  <div class="contact-block">
+    <div class="contact-header email">
+      <i class="fa fa-shield-halved fa-lg"></i>
+      <div>
+        Fairfax / FFPlace
+        <div class="contact-meta"><i class="fa fa-envelope"></i> sinistros@ffplace.com.br</div>
+      </div>
+    </div>
+
+    <div class="tpl-card">
+      <div class="tpl-label">Atualização de Status — Mai/2026</div>
+      <div class="tpl-body" id="email3">Assunto: Sinistro FAI303306 — Atualização de Status — Mai/2026
+
+Prezados,
+
+Encaminhamos atualização do sinistro FAI303306 — Dr. Raymundo Nonato Almeida Junior:
+
+SITUAÇÃO ATUAL:
+• Reguladora Addvalora em contato (Aline Lonardoni)
+• 2 de 23 documentos concluídos (8,7%)
+• Prontuário médico em coleta — item crítico
+• Audiência de 07/05/2026 realizada — aguardando retorno do advogado de defesa
+
+PRÓXIMAS AÇÕES:
+• Coleta urgente do prontuário médico
+• Alinhamento pós-audiência com Cândido & Henrique
+• Envio de documentação parcial à Addvalora
+
+Atenciosamente,
+Marcelo Brandão
+Mar Del Plata Corretora de Seguros
+SUSEP 202031070</div>
+      <div class="tpl-actions">
+        <button class="btn-tpl copy"  onclick="copiar('email3')"><i class="fa fa-copy"></i> Copiar</button>
+        <button class="btn-tpl email" onclick="abrirEmail('sinistros@ffplace.com.br','Sinistro FAI303306 — Atualização de Status — Mai/2026','email3')">
+          <i class="fa fa-envelope"></i> Abrir E-mail
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Bottom Nav -->
+<nav class="bottom-nav">
+  <a href="index.html"      class="nav-item"><i class="fa fa-house"></i><span>Início</span></a>
+  <a href="sinistro.html"   class="nav-item"><i class="fa fa-file-shield"></i><span>Sinistro</span></a>
+  <a href="checklist.html"  class="nav-item"><i class="fa fa-list-check"></i><span>Checklist</span></a>
+  <a href="mensagens.html"  class="nav-item active"><i class="fa fa-comment-dots"></i><span>Mensagens</span></a>
+  <a href="analise-ia.html" class="nav-item"><i class="fa fa-robot"></i><span>IA</span></a>
+</nav>
+
+<script>
+function copiar(id) {
+  const text = document.getElementById(id).innerText;
+  navigator.clipboard.writeText(text)
+    .then(() => mostrarToast('Copiado para a área de transferência!'))
+    .catch(() => mostrarToast('Erro ao copiar — use Ctrl+C'));
+}
+
+function abrirWA(id) {
+  const text = encodeURIComponent(document.getElementById(id).innerText);
+  window.open('https://wa.me/?text=' + text, '_blank');
+}
+
+function abrirEmail(to, subject, bodyId) {
+  const body = encodeURIComponent(document.getElementById(bodyId).innerText);
+  window.open(`mailto:${to}?subject=${encodeURIComponent(subject)}&body=${body}`, '_blank');
+}
+
+function mostrarToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>

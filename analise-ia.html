@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Análise IA — FAI303306</title>
+<link rel="stylesheet" href="assets/css/rcp-core.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+.ia-toolbar {
+  position: sticky; top: 0; z-index: 200;
+  background: var(--c-primary); color: #fff;
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px;
+}
+.ia-toolbar h1 { font-size: 1rem; font-weight: 600; flex: 1; }
+.btn-back { background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; padding: 4px 8px; }
+
+.risk-hero {
+  background: linear-gradient(135deg, #7b0000 0%, #b71c1c 100%);
+  color: #fff; padding: 20px 16px; margin: 16px;
+  border-radius: var(--radius);
+}
+.risk-hero .risk-label { font-size: .75rem; opacity: .85; text-transform: uppercase; letter-spacing: .06em; }
+.risk-hero .risk-value { font-size: 2.5rem; font-weight: 800; margin: 4px 0; }
+.risk-hero .risk-subtitle { font-size: .85rem; opacity: .9; }
+.risk-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 16px; }
+.risk-metric { background: rgba(255,255,255,.15); border-radius: 8px; padding: 10px 8px; text-align: center; }
+.risk-metric .val { font-size: 1.1rem; font-weight: 700; }
+.risk-metric .lbl { font-size: .65rem; opacity: .8; margin-top: 2px; }
+
+.ia-section { margin: 0 16px 16px; }
+.ia-section h2 {
+  font-size: .85rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .06em; color: var(--c-muted); margin-bottom: 10px;
+  display: flex; align-items: center; gap: 6px;
+}
+
+.factors-grid { display: grid; gap: 8px; }
+.factor-card {
+  background: var(--c-surface); border: 1px solid var(--c-border);
+  border-radius: var(--radius); padding: 12px 14px;
+  display: flex; align-items: flex-start; gap: 12px;
+}
+.factor-icon {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; font-size: .9rem;
+}
+.factor-icon.red    { background: #fde8e8; color: #b71c1c; }
+.factor-icon.orange { background: #fff3e0; color: #e65100; }
+.factor-icon.yellow { background: #fffde7; color: #f57f17; }
+.factor-icon.blue   { background: #e3f2fd; color: #1565c0; }
+.factor-title { font-size: .88rem; font-weight: 600; color: var(--c-text); }
+.factor-desc  { font-size: .78rem; color: var(--c-muted); margin-top: 2px; line-height: 1.45; }
+
+.actions-list { display: flex; flex-direction: column; gap: 10px; }
+.action-item {
+  background: var(--c-surface); border: 1px solid var(--c-border);
+  border-radius: var(--radius); padding: 12px 14px;
+  display: flex; align-items: flex-start; gap: 12px;
+}
+.action-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--c-primary); color: #fff;
+  font-size: .8rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.action-item.done   .action-num { background: #2e7d32; }
+.action-item.urgent .action-num { background: var(--c-danger); }
+.action-text { font-size: .85rem; color: var(--c-text); line-height: 1.5; flex: 1; }
+.action-tag {
+  display: inline-block; font-size: .7rem;
+  padding: 2px 8px; border-radius: 20px; margin-top: 4px; font-weight: 600;
+}
+.action-tag.urgente   { background: #fde8e8; color: #b71c1c; }
+.action-tag.concluido { background: #e8f5e9; color: #2e7d32; }
+.action-tag.pendente  { background: #fff3e0; color: #e65100; }
+
+.financial-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.fin-card {
+  background: var(--c-surface); border: 1px solid var(--c-border);
+  border-radius: var(--radius); padding: 14px;
+}
+.fin-label { font-size: .72rem; color: var(--c-muted); text-transform: uppercase; letter-spacing: .04em; }
+.fin-value { font-size: 1.1rem; font-weight: 700; color: var(--c-text); margin-top: 4px; }
+.fin-value.danger  { color: var(--c-danger); }
+.fin-value.warning { color: #f57f17; }
+.fin-note  { font-size: .7rem; color: var(--c-muted); margin-top: 3px; }
+
+.timeline-pred { display: flex; flex-direction: column; gap: 0; }
+.tl-item { display: flex; align-items: flex-start; gap: 12px; padding-bottom: 16px; position: relative; }
+.tl-item:not(:last-child)::after {
+  content: ''; position: absolute;
+  left: 13px; top: 28px; bottom: 0;
+  width: 2px; background: var(--c-border);
+}
+.tl-dot {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 2px solid var(--c-border); background: var(--c-bg);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .75rem; flex-shrink: 0; z-index: 1;
+}
+.tl-dot.past { background: #2e7d32;  border-color: #2e7d32;  color: #fff; }
+.tl-dot.now  { background: var(--c-danger); border-color: var(--c-danger); color: #fff; }
+.tl-dot.pred { background: #fff; border-color: var(--c-primary); color: var(--c-primary); }
+.tl-content { flex: 1; padding-top: 4px; }
+.tl-date { font-size: .72rem; color: var(--c-muted); font-weight: 600; }
+.tl-desc { font-size: .83rem; color: var(--c-text); margin-top: 2px; }
+.tl-badge {
+  display: inline-block; font-size: .68rem;
+  padding: 2px 7px; border-radius: 10px; margin-top: 4px;
+}
+.tl-badge.ia { background: #e8eaf6; color: #3949ab; }
+
+.ai-generator {
+  background: var(--c-surface); border: 1px solid var(--c-border);
+  border-radius: var(--radius); padding: 16px;
+}
+.ai-generator .prompt-area {
+  width: 100%; border: 1px solid var(--c-border); border-radius: 8px;
+  padding: 10px 12px; font-family: inherit; font-size: .85rem;
+  resize: vertical; min-height: 80px;
+  background: var(--c-bg); color: var(--c-text);
+  box-sizing: border-box;
+}
+.ai-output {
+  margin-top: 12px; background: #f8f9fa;
+  border: 1px solid var(--c-border); border-radius: 8px;
+  padding: 14px; font-size: .83rem; line-height: 1.65;
+  color: var(--c-text); display: none; white-space: pre-wrap;
+}
+.ai-output.visible { display: block; }
+.model-row { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+.model-chip {
+  padding: 5px 12px; border-radius: 20px;
+  border: 1.5px solid var(--c-border); background: var(--c-bg);
+  font-size: .78rem; cursor: pointer; transition: all .2s;
+}
+.model-chip.active { border-color: var(--c-primary); background: var(--c-primary); color: #fff; }
+.ai-status { font-size: .75rem; color: var(--c-muted); margin-top: 8px; display: flex; align-items: center; gap: 6px; }
+.ai-status .dot { width: 8px; height: 8px; border-radius: 50%; background: #ccc; }
+.ai-status.connected .dot { background: #2e7d32; }
+.ai-status.loading   .dot { background: var(--c-accent); animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+.page-content { padding-bottom: calc(var(--nav-h) + var(--safe-b) + 16px); }
+@media(min-width:1100px){ .page-content { padding-bottom: 24px; } }
+</style>
+</head>
+<body>
+
+<div class="ia-toolbar">
+  <button class="btn-back" onclick="history.back()" aria-label="Voltar"><i class="fa fa-arrow-left"></i></button>
+  <h1><i class="fa fa-robot" style="margin-right:6px;opacity:.8"></i>Análise IA — FAI303306</h1>
+  <span style="font-size:.7rem;background:rgba(255,255,255,.2);padding:3px 8px;border-radius:10px;">BETA</span>
+</div>
+
+<div class="page-content">
+
+  <!-- Risk Hero -->
+  <div class="risk-hero">
+    <div class="risk-label"><i class="fa fa-shield-halved"></i> Nível de Risco</div>
+    <div class="risk-value">ALTO</div>
+    <div class="risk-subtitle">Dr. Raymundo Nonato A. Junior — Cirurgia Bariátrica</div>
+    <div class="risk-metrics">
+      <div class="risk-metric">
+        <div class="val">R$ 1,78M</div>
+        <div class="lbl">Estimativa</div>
+      </div>
+      <div class="risk-metric">
+        <div class="val">8,7%</div>
+        <div class="lbl">Docs OK</div>
+      </div>
+      <div class="risk-metric">
+        <div class="val">Vencida</div>
+        <div class="lbl">Audiência</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fatores de Risco -->
+  <div class="ia-section">
+    <h2><i class="fa fa-triangle-exclamation"></i> Fatores de Risco Identificados</h2>
+    <div class="factors-grid">
+
+      <div class="factor-card">
+        <div class="factor-icon red"><i class="fa fa-calendar-xmark"></i></div>
+        <div>
+          <div class="factor-title">Audiência já realizada</div>
+          <div class="factor-desc">Data 07/05/2026 passou sem documentação completa. Prazo perdido pode comprometer a defesa.</div>
+        </div>
+      </div>
+
+      <div class="factor-card">
+        <div class="factor-icon red"><i class="fa fa-file-medical"></i></div>
+        <div>
+          <div class="factor-title">Prontuário médico ausente</div>
+          <div class="factor-desc">Item 2.10 (crítico) não enviado. Addvalora não pode iniciar regulação sem ele.</div>
+        </div>
+      </div>
+
+      <div class="factor-card">
+        <div class="factor-icon orange"><i class="fa fa-money-bill-wave"></i></div>
+        <div>
+          <div class="factor-title">Valor próximo ao limite</div>
+          <div class="factor-desc">Prejuízo estimado R$ 1.784.733 vs cobertura R$ 2.000.000. Margem de apenas 10,8%.</div>
+        </div>
+      </div>
+
+      <div class="factor-card">
+        <div class="factor-icon orange"><i class="fa fa-gavel"></i></div>
+        <div>
+          <div class="factor-title">Processo judicial ativo</div>
+          <div class="factor-desc">15ª Vara Cível — fase de instrução. Advogado Cândido & Henrique precisa de suporte documental urgente.</div>
+        </div>
+      </div>
+
+      <div class="factor-card">
+        <div class="factor-icon yellow"><i class="fa fa-clock-rotate-left"></i></div>
+        <div>
+          <div class="factor-title">Sinistro em claims-made period</div>
+          <div class="factor-desc">Notificação de 20/03/2025 dentro da vigência. Cobertura válida, mas regulação em aberto.</div>
+        </div>
+      </div>
+
+      <div class="factor-card">
+        <div class="factor-icon blue"><i class="fa fa-user-doctor"></i></div>
+        <div>
+          <div class="factor-title">Especialidade de alto risco</div>
+          <div class="factor-desc">Cirurgia bariátrica tem sinistralidade histórica elevada — Addvalora tende a escrutinar mais.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Ações Recomendadas -->
+  <div class="ia-section">
+    <h2><i class="fa fa-list-check"></i> Ações Recomendadas</h2>
+    <div class="actions-list">
+
+      <div class="action-item urgent">
+        <div class="action-num">1</div>
+        <div class="action-text">
+          Contatar segurado para obter prontuário médico completo (doc 2.10) — desbloqueador principal da regulação.
+          <br><span class="action-tag urgente"><i class="fa fa-fire"></i> Urgente hoje</span>
+        </div>
+      </div>
+
+      <div class="action-item urgent">
+        <div class="action-num">2</div>
+        <div class="action-text">
+          Acionar Cândido & Henrique sobre resultado da audiência de 07/05. Verificar decisão ou nova data.
+          <br><span class="action-tag urgente"><i class="fa fa-gavel"></i> Urgente hoje</span>
+        </div>
+      </div>
+
+      <div class="action-item">
+        <div class="action-num">3</div>
+        <div class="action-text">
+          Enviar Aviso de Sinistro RCP à Addvalora (Aline Lonardoni) com documentos disponíveis (1.1 e 1.2).
+          <br><span class="action-tag pendente"><i class="fa fa-envelope"></i> Esta semana</span>
+        </div>
+      </div>
+
+      <div class="action-item">
+        <div class="action-num">4</div>
+        <div class="action-text">
+          Definir itens condicionais 2.3, 2.5, 2.6, 2.8 junto ao segurado (Sim/Não).
+          <br><span class="action-tag pendente"><i class="fa fa-file-circle-question"></i> Esta semana</span>
+        </div>
+      </div>
+
+      <div class="action-item">
+        <div class="action-num">5</div>
+        <div class="action-text">
+          Solicitar ao advogado cópia da petição inicial (2.7) e contestação (3.1).
+          <br><span class="action-tag pendente"><i class="fa fa-scale-balanced"></i> 7 dias</span>
+        </div>
+      </div>
+
+      <div class="action-item done">
+        <div class="action-num"><i class="fa fa-check"></i></div>
+        <div class="action-text">
+          Aviso de sinistro registrado — Fairfax confirmou abertura do processo FAI303306.
+          <br><span class="action-tag concluido"><i class="fa fa-check"></i> Concluído</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Exposição Financeira -->
+  <div class="ia-section">
+    <h2><i class="fa fa-chart-pie"></i> Exposição Financeira</h2>
+    <div class="financial-grid">
+      <div class="fin-card">
+        <div class="fin-label">Estimativa Prejuízo</div>
+        <div class="fin-value danger">R$ 1.784.733</div>
+        <div class="fin-note">Reclamante via advogado</div>
+      </div>
+      <div class="fin-card">
+        <div class="fin-label">Limite de Cobertura</div>
+        <div class="fin-value">R$ 2.000.000</div>
+        <div class="fin-note">Apólice 47-5-0031448</div>
+      </div>
+      <div class="fin-card">
+        <div class="fin-label">Franquia</div>
+        <div class="fin-value">A verificar</div>
+        <div class="fin-note">Consultar condições</div>
+      </div>
+      <div class="fin-card">
+        <div class="fin-label">Margem Cobertura</div>
+        <div class="fin-value warning">R$ 215.267</div>
+        <div class="fin-note">10,8% acima do pedido</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Previsão de Cronograma -->
+  <div class="ia-section">
+    <h2><i class="fa fa-route"></i> Previsão de Cronograma</h2>
+    <div class="timeline-pred">
+
+      <div class="tl-item">
+        <div class="tl-dot past"><i class="fa fa-check"></i></div>
+        <div class="tl-content">
+          <div class="tl-date">20 Mar 2025</div>
+          <div class="tl-desc">Abertura do sinistro — Fairfax</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot past"><i class="fa fa-check"></i></div>
+        <div class="tl-content">
+          <div class="tl-date">28 Mar 2025</div>
+          <div class="tl-desc">Designação Addvalora como reguladora</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot now"><i class="fa fa-circle-dot"></i></div>
+        <div class="tl-content">
+          <div class="tl-date">Hoje — Mai 2026</div>
+          <div class="tl-desc">Coleta de documentação — crítico: prontuário médico</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot pred"><i class="fa fa-clock"></i></div>
+        <div class="tl-content">
+          <div class="tl-date">Jun 2026 (estimado) <span class="tl-badge ia"><i class="fa fa-robot"></i> IA</span></div>
+          <div class="tl-desc">Regulação Addvalora concluída — parecer técnico</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot pred"><i class="fa fa-clock"></i></div>
+        <div class="tl-content">
+          <div class="tl-date">Ago–Set 2026 (estimado) <span class="tl-badge ia"><i class="fa fa-robot"></i> IA</span></div>
+          <div class="tl-desc">Proposta de acordo ou posição Fairfax</div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot pred"><i class="fa fa-flag"></i></div>
+        <div class="tl-content">
+          <div class="tl-date">2027 (estimado) <span class="tl-badge ia"><i class="fa fa-robot"></i> IA</span></div>
+          <div class="tl-desc">Encerramento — liquidação ou sentença judicial</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Gerador IA -->
+  <div class="ia-section">
+    <h2><i class="fa fa-wand-magic-sparkles"></i> Gerador de Análise IA</h2>
+    <div class="ai-generator">
+
+      <div class="model-row">
+        <div class="model-chip active" onclick="selectModel(this,'claude')">Claude 3.5</div>
+        <div class="model-chip" onclick="selectModel(this,'gpt4')">GPT-4o</div>
+        <div class="model-chip" onclick="selectModel(this,'deepseek')">DeepSeek</div>
+      </div>
+
+      <textarea class="prompt-area" id="aiPrompt" placeholder="Ex: Analise o risco de perda neste sinistro considerando os documentos ausentes...">Gere um resumo executivo deste sinistro RCP para apresentação à seguradora Fairfax, destacando status atual, documentos pendentes e próximos passos.</textarea>
+
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="gerarAnalise()" id="btnGerar" style="flex:1;min-width:140px;">
+          <i class="fa fa-robot"></i> Gerar Análise
+        </button>
+        <button class="btn" onclick="copiarResposta()" id="btnCopiar"
+          style="display:none;border:1px solid var(--c-border);">
+          <i class="fa fa-copy"></i> Copiar
+        </button>
+      </div>
+
+      <div class="ai-status" id="aiStatus">
+        <div class="dot"></div>
+        <span id="aiStatusText">API não configurada — modo demonstração ativo</span>
+      </div>
+
+      <div class="ai-output" id="aiOutput"></div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- Bottom Nav -->
+<nav class="bottom-nav">
+  <a href="index.html"      class="nav-item"><i class="fa fa-house"></i><span>Início</span></a>
+  <a href="sinistro.html"   class="nav-item"><i class="fa fa-file-shield"></i><span>Sinistro</span></a>
+  <a href="checklist.html"  class="nav-item"><i class="fa fa-list-check"></i><span>Checklist</span></a>
+  <a href="mensagens.html"  class="nav-item"><i class="fa fa-comment-dots"></i><span>Mensagens</span></a>
+  <a href="analise-ia.html" class="nav-item active"><i class="fa fa-robot"></i><span>IA</span></a>
+</nav>
+
+<script>
+let selectedModel = 'claude';
+
+function selectModel(el, model) {
+  document.querySelectorAll('.model-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  selectedModel = model;
+}
+
+async function gerarAnalise() {
+  const prompt = document.getElementById('aiPrompt').value.trim();
+  if (!prompt) { alert('Digite uma pergunta ou instrução.'); return; }
+
+  const btn        = document.getElementById('btnGerar');
+  const status     = document.getElementById('aiStatus');
+  const statusText = document.getElementById('aiStatusText');
+  const output     = document.getElementById('aiOutput');
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Gerando...';
+  status.className = 'ai-status loading';
+  statusText.textContent = 'Conectando à API IA...';
+  output.classList.remove('visible');
+
+  try {
+    const res = await fetch('api/api_proxy.php', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model:  selectedModel,
+        prompt: prompt,
+        context: {
+          sinistro:      'FAI303306',
+          segurado:      'Dr. Raymundo Nonato Almeida Junior',
+          especialidade: 'Cirurgia Bariátrica',
+          valor:         'R$ 1.784.733,00',
+          cobertura:     'R$ 2.000.000,00',
+          docs_pendentes: 16,
+          audiencia:     '07/05/2026 (realizada)'
+        }
+      }),
+      signal: AbortSignal.timeout(30000)
+    });
+
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    output.textContent = data.response || data.content || '';
+    status.className = 'ai-status connected';
+    statusText.textContent = `Resposta via ${selectedModel.toUpperCase()} — ${new Date().toLocaleTimeString('pt-BR')}`;
+
+  } catch {
+    await new Promise(r => setTimeout(r, 1800));
+    output.innerHTML = gerarRespostaDemo(prompt);
+    status.className = 'ai-status';
+    statusText.textContent = 'Modo demonstração — configure api/api_proxy.php para IA real';
+  }
+
+  output.classList.add('visible');
+  document.getElementById('btnCopiar').style.display = 'inline-flex';
+  btn.disabled = false;
+  btn.innerHTML = '<i class="fa fa-robot"></i> Gerar Análise';
+}
+
+function gerarRespostaDemo(prompt) {
+  return `<strong>RESUMO EXECUTIVO — SINISTRO FAI303306</strong>\n\n` +
+    `<strong>Segurado:</strong> Dr. Raymundo Nonato Almeida Junior\n` +
+    `<strong>Especialidade:</strong> Cirurgia Bariátrica | <strong>Risco:</strong> ALTO\n\n` +
+    `<strong>Status Atual:</strong>\n` +
+    `O sinistro está em fase crítica de regulação pela Addvalora. A audiência judicial de 07/05/2026 foi realizada sem documentação técnica completa, o que pode ter impactado a posição do segurado.\n\n` +
+    `<strong>Documentos Pendentes (16/23):</strong>\n` +
+    `• CRÍTICO: Prontuário médico completo (item 2.10) — desbloqueador da regulação\n` +
+    `• Laudos periciais e exames (itens 2.4, 2.9)\n` +
+    `• Documentos judiciais (petição inicial 2.7, contestação 3.1)\n` +
+    `• 5 itens condicionais aguardando confirmação do segurado\n\n` +
+    `<strong>Próximos Passos:</strong>\n` +
+    `1. Contato imediato com Dr. Raymundo para prontuário médico\n` +
+    `2. Alinhamento com Cândido & Henrique sobre audiência de 07/05\n` +
+    `3. Envio de documentação parcial à Addvalora (Aline Lonardoni)\n` +
+    `4. Definição de itens condicionais 2.3, 2.5, 2.6, 2.8\n\n` +
+    `<strong>Perspectiva:</strong>\n` +
+    `Com ação imediata na documentação, estimativa de conclusão da regulação em 45–60 dias. Valor em risco (R$ 1.784.733) dentro da cobertura contratada (R$ 2.000.000).\n\n` +
+    `<em>Análise gerada em modo demonstração. Configure api/api_proxy.php para IA real.</em>`;
+}
+
+function copiarResposta() {
+  const text = document.getElementById('aiOutput').innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('btnCopiar');
+    btn.innerHTML = '<i class="fa fa-check"></i> Copiado!';
+    setTimeout(() => { btn.innerHTML = '<i class="fa fa-copy"></i> Copiar'; }, 2000);
+  });
+}
+</script>
+</body>
+</html>
