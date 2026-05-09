@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Procuração — FAI303306</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Georgia,Times,serif;background:#e8ecef;color:#1a1a1a;font-size:14px;}
+
+.toolbar{
+  position:sticky;top:0;z-index:100;
+  background:#003366;color:#fff;
+  display:flex;align-items:center;gap:10px;
+  padding:12px 16px;box-shadow:0 2px 8px rgba(0,0,0,.3);
+  font-family:'Segoe UI',Arial,sans-serif;
+}
+.toolbar h1{font-size:.95rem;font-weight:600;flex:1;}
+.tbtn{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:7px 13px;border-radius:6px;border:none;
+  font-size:.8rem;cursor:pointer;font-weight:600;transition:opacity .15s;
+  font-family:'Segoe UI',Arial,sans-serif;
+}
+.tbtn:hover{opacity:.85;}
+.tbtn-back {background:rgba(255,255,255,.15);color:#fff;}
+.tbtn-print{background:#5c7cfa;color:#fff;}
+.tbtn-pdf  {background:#f26522;color:#fff;}
+
+.page-wrap{display:flex;justify-content:center;padding:24px 12px 48px;}
+#page{
+  background:#fff;width:210mm;max-width:100%;
+  min-height:297mm;padding:22mm 24mm 26mm;
+  box-shadow:0 4px 24px rgba(0,0,0,.15);
+  line-height:1.85;
+}
+
+.proc-title{
+  text-align:center;margin-bottom:26px;
+  padding-bottom:14px;border-bottom:1.5px solid #333;
+}
+.proc-title h1{
+  font-size:1.25rem;font-weight:700;letter-spacing:.18em;
+  text-transform:uppercase;color:#1a1a1a;
+}
+.proc-title .sub{font-size:.8rem;color:#555;margin-top:5px;font-style:italic;}
+
+.proc-sec{margin-bottom:20px;font-size:.88rem;text-align:justify;}
+.sec-heading{
+  font-weight:700;text-transform:uppercase;font-size:.72rem;
+  letter-spacing:.07em;color:#333;
+  border-bottom:1px solid #ddd;padding-bottom:4px;margin-bottom:10px;
+  font-family:'Segoe UI',Arial,sans-serif;
+}
+
+.f{
+  display:inline;border-bottom:1px solid #777;
+  min-width:80px;outline:none;padding:0 2px;
+}
+.f:focus{background:#fffbe6;}
+.f-wide  {min-width:200px;}
+.f-mid   {min-width:130px;}
+.f-sm    {min-width:65px;}
+
+.legal{font-size:.87rem;line-height:1.9;text-align:justify;color:#1a1a1a;}
+
+.sig-main{text-align:center;margin-top:36px;}
+.sig-main .sig-line{border-top:1px solid #333;width:60%;margin:0 auto 7px;}
+.sig-main .sig-label{font-size:.78rem;color:#555;font-family:'Segoe UI',Arial,sans-serif;}
+
+.witness-row{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:22px;}
+.witness-col{text-align:center;}
+.witness-col .sig-line{border-top:1px solid #333;margin-bottom:6px;}
+.witness-col .sig-label{font-size:.73rem;color:#666;font-family:'Segoe UI',Arial,sans-serif;}
+
+.doc-footer{
+  margin-top:30px;padding-top:8px;border-top:1px solid #eee;
+  display:flex;justify-content:space-between;font-size:.62rem;color:#aaa;
+  font-family:'Segoe UI',Arial,sans-serif;
+}
+
+@media print{
+  .toolbar{display:none!important;}
+  .page-wrap{padding:0;background:none;}
+  #page{box-shadow:none;}
+  @page{size:A4;margin:0;}
+}
+@media(max-width:680px){
+  #page{padding:14px;}
+  .witness-row{grid-template-columns:1fr;gap:16px;}
+}
+</style>
+</head>
+<body>
+
+<div class="toolbar" id="toolbar">
+  <button class="tbtn tbtn-back" onclick="history.back()"><i class="fa fa-arrow-left"></i></button>
+  <h1><i class="fa fa-stamp" style="margin-right:5px;opacity:.8"></i>Procuração — Sinistro FAI303306</h1>
+  <button class="tbtn tbtn-print" onclick="window.print()"><i class="fa fa-print"></i> Imprimir</button>
+  <button class="tbtn tbtn-pdf"   onclick="exportarPDF()"><i class="fa fa-file-pdf"></i> PDF</button>
+</div>
+
+<div class="page-wrap">
+<div id="page">
+
+  <div class="proc-title">
+    <h1>Procuração</h1>
+    <div class="sub">Ad judicia et extra — Responsabilidade Civil Profissional</div>
+  </div>
+
+  <div class="proc-sec">
+    <div class="sec-heading">Outorgante</div>
+    <div class="legal">
+      <b>Dr. Raymundo Nonato Almeida Junior</b>, médico, especialidade Cirurgia Bariátrica,
+      CRM <span class="f f-mid" contenteditable="true" id="crmField">CRM-XX/000000</span>,
+      CPF nº <span class="f f-mid" contenteditable="true">000.000.000-00</span>,
+      RG nº <span class="f f-mid" contenteditable="true">00.000.000-0</span>,
+      residente e domiciliado à
+      <span class="f f-wide" contenteditable="true">Rua/Av., nº, Bairro, Cidade/UF, CEP</span>,
+      pelo presente instrumento particular de procuração, nomeia e constitui seu bastante procurador(a):
+    </div>
+  </div>
+
+  <div class="proc-sec">
+    <div class="sec-heading">Outorgado(a)</div>
+    <div class="legal">
+      <span class="f f-wide" contenteditable="true">Nome completo do advogado</span>,
+      inscrito(a) na OAB/<span class="f f-sm" contenteditable="true">UF</span>
+      sob o nº <span class="f f-mid" contenteditable="true">00.000</span>,
+      com escritório profissional à
+      <span class="f f-wide" contenteditable="true">Endereço do escritório, Cidade/UF</span>.
+    </div>
+  </div>
+
+  <div class="proc-sec">
+    <div class="sec-heading">Poderes Outorgados</div>
+    <div class="legal">
+      O outorgante confere ao outorgado os poderes gerais da cláusula <em>ad judicia</em> para representá-lo em juízo e fora dele em toda e qualquer ação ou procedimento relativo ao sinistro de Responsabilidade Civil Profissional registrado sob o número <b>FAI303306</b> junto à Fairfax Brasil Seguros, especialmente:
+      <br><br>
+      <b>I.</b> Poderes para praticar todos os atos do processo perante qualquer Juízo, Tribunal, Vara, Câmara ou instância, inclusive especiais de receber citação inicial, confessar, reconhecer a procedência do pedido, transigir, desistir, renunciar ao direito sobre que se funda a ação, receber e dar quitação, firmar compromisso, agravar, recorrer em qualquer instância e assinar declaração de pobreza, bem como substabelecer com ou sem reservas;
+      <br><br>
+      <b>II.</b> Poderes para negociar e celebrar acordos extrajudiciais com a seguradora Fairfax Brasil, com a reguladora Addvalora e com a parte reclamante, no âmbito do Proc. nº 0012345-67.2025.8.26.0100 em trâmite perante a 15ª Vara Cível de São Paulo;
+      <br><br>
+      <b>III.</b> Poderes para solicitar, receber, assinar e protocolar documentos junto a órgãos públicos, conselhos de classe, cartórios, hospitais e demais entidades relacionadas ao presente sinistro;
+      <br><br>
+      <b>IV.</b> Poderes para representar o outorgante perante o Conselho Regional de Medicina (CRM) e demais órgãos regulatórios em procedimentos vinculados ao caso em referência.
+    </div>
+  </div>
+
+  <div class="proc-sec">
+    <div class="legal">
+      São Paulo,
+      <span class="f f-sm" contenteditable="true" id="dia"></span> de
+      <span class="f f-mid" contenteditable="true" id="mes"></span> de
+      <span class="f f-sm" contenteditable="true" id="ano"></span>.
+    </div>
+  </div>
+
+  <div class="sig-main">
+    <div style="height:40px;"></div>
+    <div class="sig-line"></div>
+    <div class="sig-label">
+      Dr. Raymundo Nonato Almeida Junior — Outorgante<br>
+      CRM <span id="crmDisplay">—</span>
+    </div>
+  </div>
+
+  <div class="witness-row">
+    <div class="witness-col">
+      <div style="height:36px;"></div>
+      <div class="sig-line"></div>
+      <div class="sig-label">
+        Testemunha 1<br>
+        Nome: <span contenteditable="true">_______________________</span><br>
+        CPF: <span contenteditable="true">___.___.___-__</span>
+      </div>
+    </div>
+    <div class="witness-col">
+      <div style="height:36px;"></div>
+      <div class="sig-line"></div>
+      <div class="sig-label">
+        Testemunha 2<br>
+        Nome: <span contenteditable="true">_______________________</span><br>
+        CPF: <span contenteditable="true">___.___.___-__</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    <span>Mar Del Plata Corretora de Seguros · SUSEP 202031070</span>
+    <span>CÓD-PROC-RCP/REV.A · FAI303306</span>
+  </div>
+
+</div>
+</div>
+
+<script>
+(function(){
+  const d = new Date();
+  document.getElementById('dia').textContent = String(d.getDate()).padStart(2,'0');
+  document.getElementById('mes').textContent = d.toLocaleDateString('pt-BR',{month:'long'});
+  document.getElementById('ano').textContent = d.getFullYear();
+})();
+
+document.getElementById('crmField').addEventListener('input',function(){
+  document.getElementById('crmDisplay').textContent = this.textContent.trim() || '—';
+});
+
+async function exportarPDF(){
+  const {jsPDF} = window.jspdf;
+  const page    = document.getElementById('page');
+  const toolbar = document.getElementById('toolbar');
+  toolbar.style.display = 'none';
+  page.style.width = '210mm';
+  try{
+    const canvas = await html2canvas(page,{scale:2,useCORS:true,windowWidth:794,backgroundColor:'#ffffff'});
+    const w   = 210;
+    const h   = (canvas.height/canvas.width)*w;
+    const pdf = new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+    if(h <= 297){
+      pdf.addImage(canvas.toDataURL('image/jpeg',.92),'JPEG',0,0,w,h);
+    } else {
+      const ratio = canvas.width/w;
+      let yOff = 0;
+      while(yOff < canvas.height){
+        const sh = Math.min(297*ratio, canvas.height-yOff);
+        const sc = document.createElement('canvas');
+        sc.width = canvas.width; sc.height = sh;
+        sc.getContext('2d').drawImage(canvas,0,-yOff);
+        if(yOff > 0) pdf.addPage();
+        pdf.addImage(sc.toDataURL('image/jpeg',.92),'JPEG',0,0,w,sh/ratio);
+        yOff += sh;
+      }
+    }
+    pdf.save('Procuracao-FAI303306.pdf');
+  } finally{
+    toolbar.style.display = '';
+    page.style.width = '';
+  }
+}
+</script>
+</body>
+</html>

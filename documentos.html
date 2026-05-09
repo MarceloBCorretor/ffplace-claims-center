@@ -15,7 +15,6 @@
 }
 .doc-card.ready  { border-left-color: var(--c-primary); }
 .doc-card.done   { border-left-color: var(--c-success); }
-.doc-card.future { border-left-color: var(--c-border); opacity: .75; }
 .doc-card-body { padding: 14px 15px; }
 .doc-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
 .doc-card-icon {
@@ -25,9 +24,9 @@
 }
 .ico-blue   { background: var(--c-primary-light); color: var(--c-primary); }
 .ico-orange { background: #fde9d9; color: var(--c-accent); }
-.ico-green  { background: #d4edda; color: #155724; }
-.ico-gray   { background: #f0f0f0; color: #aaa; }
 .ico-purple { background: #f3e8ff; color: #7c3aed; }
+.ico-teal   { background: #e0f2f1; color: #00695c; }
+.ico-brown  { background: #efebe9; color: #4e342e; }
 .doc-card-title { font-size: 14px; font-weight: 700; color: var(--c-primary); line-height: 1.3; }
 .doc-card-desc  { font-size: 12px; color: var(--c-muted); margin-top: 3px; line-height: 1.4; }
 .doc-card-meta  { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
@@ -46,12 +45,12 @@
     <nav>
       <a href="index.html"      class="nav-link"><i class="fas fa-th-large"></i> Dashboard</a>
       <a href="sinistro.html"   class="nav-link"><i class="fas fa-file-medical-alt"></i> Sinistros</a>
-      <a href="checklist.html"  class="nav-link"><i class="fas fa-clipboard-check"></i> Documentos</a>
+      <a href="checklist.html"  class="nav-link"><i class="fas fa-clipboard-check"></i> Checklist</a>
       <a href="analise-ia.html" class="nav-link"><i class="fas fa-robot"></i> Análise IA</a>
       <a href="mensagens.html"  class="nav-link"><i class="fas fa-comments"></i> Mensagens</a>
       <a href="documentos.html" class="nav-link active"><i class="fas fa-file-pdf"></i> Gerar Docs</a>
     </nav>
-    <div class="sidebar-footer">SUSEP 202031074<br>FFPlace · Fairfax Brasil</div>
+    <div class="sidebar-footer">SUSEP 202031070<br>FFPlace · Fairfax Brasil</div>
   </aside>
   <div>
     <header class="app-header">
@@ -70,27 +69,26 @@
 
       <div class="alert alert-info mt-12">
         <i class="fas fa-info-circle"></i>
-        <div>Documentos pré-preenchidos com os dados do sinistro <strong>FAI303306</strong>. Revise, assine digitalmente e exporte em PDF para envio à Addvalora.</div>
+        <div>Documentos pré-preenchidos com os dados do sinistro <strong>FAI303306</strong>. Revise, preencha os campos editáveis e exporte em PDF para envio.</div>
       </div>
 
-      <!-- PRONTOS -->
-      <div class="section-head"><i class="fas fa-check-circle" style="color:var(--c-success)"></i>&nbsp;Prontos para gerar</div>
+      <div class="section-head"><i class="fas fa-check-circle" style="color:var(--c-success)"></i>&nbsp;Prontos para gerar — 5 documentos</div>
 
-      <!-- Doc 1: Aviso de Sinistro -->
+      <!-- 1: Aviso de Sinistro -->
       <div class="doc-card done">
         <div class="doc-card-body">
           <div class="doc-card-head">
             <div class="doc-card-icon ico-blue"><i class="fas fa-file-signature"></i></div>
             <div style="flex:1">
               <div class="doc-card-title">Aviso de Sinistro RCP</div>
-              <div class="doc-card-desc">Formulário oficial Fairfax com relato, datas do procedimento e da citação, assinatura do segurado</div>
+              <div class="doc-card-desc">Formulário oficial Fairfax com datas do procedimento e citação, assinatura do segurado</div>
             </div>
             <span class="badge badge-success">Gerado</span>
           </div>
           <div class="doc-card-meta">
             <span class="badge badge-primary"><i class="fas fa-building"></i>&nbsp;Fairfax</span>
             <span class="badge badge-primary"><i class="fas fa-building"></i>&nbsp;Addvalora</span>
-            <span class="badge badge-info">Item 2.1 do checklist</span>
+            <span class="badge badge-info">Item 2.1</span>
           </div>
           <div class="doc-card-actions">
             <a href="templates/aviso-sinistro-rcp.html" target="_blank" class="btn btn-primary btn-sm">
@@ -103,20 +101,20 @@
         </div>
       </div>
 
-      <!-- Doc 2: Declaração Addvalora -->
+      <!-- 2: Declaração Addvalora -->
       <div class="doc-card ready">
         <div class="doc-card-body">
           <div class="doc-card-head">
             <div class="doc-card-icon ico-orange"><i class="fas fa-file-contract"></i></div>
             <div style="flex:1">
-              <div class="doc-card-title">Declaração de Inexistência de Outros Seguros</div>
-              <div class="doc-card-desc">Modelo oficial Addvalora — declara que não existem outros seguros cobrindo os mesmos riscos</div>
+              <div class="doc-card-title">Declaração Addvalora</div>
+              <div class="doc-card-desc">Declara inexistência de outros seguros cobrindo os mesmos riscos — exigida pela reguladora</div>
             </div>
-            <span class="badge badge-warning">Pendente assinatura</span>
+            <span class="badge badge-warning">Pend. assinatura</span>
           </div>
           <div class="doc-card-meta">
             <span class="badge badge-accent"><i class="fas fa-building"></i>&nbsp;Addvalora</span>
-            <span class="badge badge-info">Item 2.2 do checklist</span>
+            <span class="badge badge-info">Item 2.2</span>
             <span class="badge badge-warning">Assinatura obrigatória</span>
           </div>
           <div class="doc-card-actions">
@@ -130,78 +128,99 @@
         </div>
       </div>
 
-      <!-- PROXIMOS -->
-      <div class="section-head" style="margin-top:8px"><i class="fas fa-clock" style="color:var(--c-warning)"></i>&nbsp;Em desenvolvimento</div>
-
-      <!-- Doc 3: Relatório Executivo -->
-      <div class="doc-card future">
+      <!-- 3: Relatório Executivo -->
+      <div class="doc-card ready">
         <div class="doc-card-body">
           <div class="doc-card-head">
             <div class="doc-card-icon ico-purple"><i class="fas fa-chart-bar"></i></div>
             <div style="flex:1">
               <div class="doc-card-title">Relatório Executivo A4</div>
-              <div class="doc-card-desc">Visão consolidada do sinistro: dados, timeline, documentação, status e análise de risco</div>
+              <div class="doc-card-desc">Visão consolidada: dados, fases, documentação, situação judicial e análise de risco</div>
             </div>
-            <span class="badge badge-info">Em breve</span>
+            <span class="badge badge-primary">Novo</span>
           </div>
           <div class="doc-card-meta">
             <span class="badge badge-primary"><i class="fas fa-building"></i>&nbsp;Uso interno</span>
             <span class="badge badge-info">Multi-página A4</span>
+            <span class="badge badge-info">Sprint 4</span>
           </div>
           <div class="doc-card-actions">
-            <button class="btn btn-ghost btn-sm" disabled><i class="fas fa-file-pdf"></i>&nbsp;Disponível no Sprint 4</button>
+            <a href="templates/relatorio-executivo.html" target="_blank" class="btn btn-primary btn-sm">
+              <i class="fas fa-eye"></i>&nbsp;Visualizar / Editar
+            </a>
+            <a href="templates/relatorio-executivo.html" target="_blank" class="btn btn-accent btn-sm">
+              <i class="fas fa-file-pdf"></i>&nbsp;Exportar PDF
+            </a>
           </div>
         </div>
       </div>
 
-      <!-- Doc 4: Carta de Encaminhamento -->
-      <div class="doc-card future">
+      <!-- 4: Carta de Encaminhamento -->
+      <div class="doc-card ready">
         <div class="doc-card-body">
           <div class="doc-card-head">
-            <div class="doc-card-icon ico-gray"><i class="fas fa-envelope-open-text"></i></div>
+            <div class="doc-card-icon ico-teal"><i class="fas fa-envelope-open-text"></i></div>
             <div style="flex:1">
               <div class="doc-card-title">Carta de Encaminhamento</div>
-              <div class="doc-card-desc">Carta formal para envio de documentos à reguladora ou à seguradora</div>
+              <div class="doc-card-desc">Carta formal com lista de documentos enviados à Addvalora, checkboxes selecionaáveis</div>
             </div>
-            <span class="badge badge-info">Em breve</span>
+            <span class="badge badge-primary">Novo</span>
+          </div>
+          <div class="doc-card-meta">
+            <span class="badge badge-accent"><i class="fas fa-building"></i>&nbsp;Addvalora</span>
+            <span class="badge badge-info">Sprint 4</span>
           </div>
           <div class="doc-card-actions">
-            <button class="btn btn-ghost btn-sm" disabled><i class="fas fa-file-pdf"></i>&nbsp;Disponível no Sprint 4</button>
+            <a href="templates/carta-encaminhamento.html" target="_blank" class="btn btn-primary btn-sm">
+              <i class="fas fa-eye"></i>&nbsp;Visualizar / Editar
+            </a>
+            <a href="templates/carta-encaminhamento.html" target="_blank" class="btn btn-accent btn-sm">
+              <i class="fas fa-file-pdf"></i>&nbsp;Exportar PDF
+            </a>
           </div>
         </div>
       </div>
 
-      <!-- Doc 5: Procuração -->
-      <div class="doc-card future">
+      <!-- 5: Procuração -->
+      <div class="doc-card ready">
         <div class="doc-card-body">
           <div class="doc-card-head">
-            <div class="doc-card-icon ico-gray"><i class="fas fa-stamp"></i></div>
+            <div class="doc-card-icon ico-brown"><i class="fas fa-stamp"></i></div>
             <div style="flex:1">
               <div class="doc-card-title">Modelo de Procuração</div>
-              <div class="doc-card-desc">Procuração ad judicia para o escritório de defesa Cândido &amp; Henrique</div>
+              <div class="doc-card-desc">Procuração <em>ad judicia et extra</em> para o escritório de defesa — campos editáveis e assinatura</div>
             </div>
-            <span class="badge badge-info">Em breve</span>
+            <span class="badge badge-primary">Novo</span>
+          </div>
+          <div class="doc-card-meta">
+            <span class="badge badge-primary"><i class="fas fa-scale-balanced"></i>&nbsp;Defesa</span>
+            <span class="badge badge-warning">Assinatura + 2 testemunhas</span>
+            <span class="badge badge-info">Sprint 4</span>
           </div>
           <div class="doc-card-actions">
-            <button class="btn btn-ghost btn-sm" disabled><i class="fas fa-file-pdf"></i>&nbsp;Disponível no Sprint 4</button>
+            <a href="templates/procuracao-modelo.html" target="_blank" class="btn btn-primary btn-sm">
+              <i class="fas fa-pen"></i>&nbsp;Abrir e Preencher
+            </a>
+            <a href="templates/procuracao-modelo.html" target="_blank" class="btn btn-accent btn-sm">
+              <i class="fas fa-file-pdf"></i>&nbsp;Exportar PDF
+            </a>
           </div>
         </div>
       </div>
 
-      <!-- Info legal -->
       <div style="padding:12px;background:var(--c-card);border-radius:var(--r);box-shadow:var(--sh);font-size:11px;color:var(--c-muted);line-height:1.5;margin-bottom:16px">
         <strong>Mar Del Plata Corretora e Assessoria de Seguros Ltda</strong> — SUSEP: 202031070<br>
         Documentos gerados via RCP Claims Center · FFPlace / Fairfax Brasil
       </div>
 
-    </div><!-- /container -->
+    </div>
   </div>
 </div>
 
 <nav class="bottom-nav">
   <button class="nav-item" onclick="location.href='index.html'"><i class="fas fa-th-large"></i><span>Dashboard</span></button>
   <button class="nav-item" onclick="location.href='sinistro.html'"><i class="fas fa-file-medical-alt"></i><span>Sinistro</span></button>
-  <button class="nav-item" onclick="location.href='checklist.html'"><i class="fas fa-clipboard-check"></i><span>Docs</span></button>
+  <button class="nav-item" onclick="location.href='checklist.html'"><i class="fas fa-clipboard-check"></i><span>Checklist</span></button>
   <button class="nav-item accent" onclick="location.href='analise-ia.html'"><i class="fas fa-robot"></i><span>IA</span></button>
 </nav>
 </body>
