@@ -4,13 +4,7 @@
 --  Execute: mysql -u root -p < _config/schema.sql
 -- =============================================================
 
-CREATE DATABASE IF NOT EXISTS rcp_claims
-  CHARACTER SET utf8mb4
-  COLLATE utf8mb4_unicode_ci;
-
-USE rcp_claims;
-
--- ─── Sinistros ──────────────────────────────────────────────────────────
+-- ─── Sinistros ────────────────────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS claims (
   id                      INT UNSIGNED    AUTO_INCREMENT PRIMARY KEY,
   claim_number            VARCHAR(50)     UNIQUE NOT NULL  COMMENT 'Ex: FAI303306',
@@ -41,7 +35,7 @@ CREATE TABLE IF NOT EXISTS claims (
   INDEX idx_prioridade (prioridade)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ─── Checklist de Documentos ─────────────────────────────────────────────
+-- ─── Checklist de Documentos ──────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS checklist_items (
   id                  INT UNSIGNED   AUTO_INCREMENT PRIMARY KEY,
   claim_id            INT UNSIGNED   NOT NULL,
@@ -60,7 +54,7 @@ CREATE TABLE IF NOT EXISTS checklist_items (
   INDEX idx_claim_phase (claim_id, phase)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ─── Timeline de Eventos ──────────────────────────────────────────────────
+-- ─── Timeline de Eventos ──────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS claim_timeline (
   id          INT UNSIGNED   AUTO_INCREMENT PRIMARY KEY,
   claim_id    INT UNSIGNED   NOT NULL,
@@ -73,7 +67,7 @@ CREATE TABLE IF NOT EXISTS claim_timeline (
   INDEX idx_claim_date (claim_id, event_date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ─── Dados demo: caso Dr. Raymundo ───────────────────────────────────────────
+-- ─── Dados demo: caso Dr. Raymundo ──────────────────────────────────────────────────────
 INSERT INTO claims (
   claim_number, segurado, especialidade, cidade_uf,
   apolice, seguradora, cobertura,
