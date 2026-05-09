@@ -2,10 +2,9 @@
 /**
  * RCP Claims Center — Secure AI API Proxy
  * Suporte: Claude (Anthropic), OpenAI GPT-4o, DeepSeek
- * Chaves carregadas de _config/ai_keys.php (bloqueado por .htaccess)
+ * Chaves carregadas de _config/ai_keys.php ou variáveis de ambiente
  */
 
-// ─── Security headers ─────────────────────────────────────────────────────────
 header('Content-Type: application/json; charset=utf-8');
 header('X-Content-Type-Options: nosniff');
 header('X-Frame-Options: DENY');
@@ -56,13 +55,16 @@ if ($hits >= $limit) {
 file_put_contents($rateFile, json_encode(['ts' => time(), 'hits' => $hits + 1]), LOCK_EX);
 
 // ─── Carregar chaves de API ───────────────────────────────────────────────────
+// Prioridade: variáveis de ambiente (Vercel) > _config/ai_keys.php
 $keysFile = __DIR__ . '/../_config/ai_keys.php';
-if (!file_exists($keysFile)) {
-    http_response_code(503);
-    echo json_encode(['error' => 'Chaves de API não configuradas. Crie o arquivo _config/ai_keys.php']);
-    exit;
+if (file_exists($keysFile)) {
+    require $keysFile;
+} else {
+    $AI_KEYS = [];
 }
-require $keysFile; // define $AI_KEYS[]
+if (getenv('ANTHROPIC_KEY')) $AI_KEYS['anthropic'] = getenv('ANTHROPIC_KEY');
+if (getenv('OPENAI_KEY'))    $AI_KEYS['openai']    = getenv('OPENAI_KEY');
+if (getenv('DEEPSEEK_KEY'))  $AI_KEYS['deepseek']  = getenv('DEEPSEEK_KEY');
 
 // ─── Validar e sanitizar entrada ──────────────────────────────────────────────
 $raw   = file_get_contents('php://input');
@@ -78,7 +80,6 @@ $model   = preg_replace('/[^a-z0-9_\-]/', '', strtolower((string)($input['model'
 $prompt  = mb_substr(strip_tags((string)$input['prompt']), 0, 4000);
 $context = is_array($input['context'] ?? null) ? $input['context'] : [];
 
-// Montar contexto textual
 $ctxStr = '';
 if (!empty($context)) {
     $ctxStr = "\n\nCONTEXTO DO SINISTRO:\n";
@@ -110,22 +111,11 @@ try {
     echo json_encode(['error' => 'Erro no provedor IA: ' . $e->getMessage()]);
 }
 
-// ─── Funções dos provedores ───────────────────────────────────────────────────
-
 function callClaude(string $system, string $prompt, string $key): string
 {
-    if (!$key) throw new Exception('Chave Anthropic não configurada em _config/ai_keys.php');
-    $body = json_encode([
-        'model'      => 'claude-3-5-sonnet-20241022',
-        'max_tokens' => 1024,
-        'system'     => $system,
-        'messages'   => [['role' => 'user', 'content' => $prompt]],
-    ]);
-    $res  = httpPost('https://api.anthropic.com/v1/messages', $body, [
-        'x-api-key: ' . $key,
-        'anthropic-version: 2023-06-01',
-        'content-type: application/json',
-    ]);
+    if (!$key) throw new Exception('Chave Anthropic não configurada');
+    $body = json_encode(['model'=>'claude-3-5-sonnet-20241022','max_tokens'=>1024,'system'=>$system,'messages'=>[['role'=>'user','content'=>$prompt]]]);
+    $res  = httpPost('https://api.anthropic.com/v1/messages', $body, ['x-api-key: '.$key,'anthropic-version: 2023-06-01','content-type: application/json']);
     $data = json_decode($res, true);
     $text = $data['content'][0]['text'] ?? null;
     if ($text === null) throw new Exception('Resposta inesperada do Claude');
@@ -134,19 +124,9 @@ function callClaude(string $system, string $prompt, string $key): string
 
 function callOpenAI(string $system, string $prompt, string $key): string
 {
-    if (!$key) throw new Exception('Chave OpenAI não configurada em _config/ai_keys.php');
-    $body = json_encode([
-        'model'      => 'gpt-4o',
-        'max_tokens' => 1024,
-        'messages'   => [
-            ['role' => 'system', 'content' => $system],
-            ['role' => 'user',   'content' => $prompt],
-        ],
-    ]);
-    $res  = httpPost('https://api.openai.com/v1/chat/completions', $body, [
-        'Authorization: Bearer ' . $key,
-        'Content-Type: application/json',
-    ]);
+    if (!$key) throw new Exception('Chave OpenAI não configurada');
+    $body = json_encode(['model'=>'gpt-4o','max_tokens'=>1024,'messages'=>[['role'=>'system','content'=>$system],['role'=>'user','content'=>$prompt]]]);
+    $res  = httpPost('https://api.openai.com/v1/chat/completions', $body, ['Authorization: Bearer '.$key,'Content-Type: application/json']);
     $data = json_decode($res, true);
     $text = $data['choices'][0]['message']['content'] ?? null;
     if ($text === null) throw new Exception('Resposta inesperada do OpenAI');
@@ -155,19 +135,9 @@ function callOpenAI(string $system, string $prompt, string $key): string
 
 function callDeepSeek(string $system, string $prompt, string $key): string
 {
-    if (!$key) throw new Exception('Chave DeepSeek não configurada em _config/ai_keys.php');
-    $body = json_encode([
-        'model'      => 'deepseek-chat',
-        'max_tokens' => 1024,
-        'messages'   => [
-            ['role' => 'system', 'content' => $system],
-            ['role' => 'user',   'content' => $prompt],
-        ],
-    ]);
-    $res  = httpPost('https://api.deepseek.com/v1/chat/completions', $body, [
-        'Authorization: Bearer ' . $key,
-        'Content-Type: application/json',
-    ]);
+    if (!$key) throw new Exception('Chave DeepSeek não configurada');
+    $body = json_encode(['model'=>'deepseek-chat','max_tokens'=>1024,'messages'=>[['role'=>'system','content'=>$system],['role'=>'user','content'=>$prompt]]]);
+    $res  = httpPost('https://api.deepseek.com/v1/chat/completions', $body, ['Authorization: Bearer '.$key,'Content-Type: application/json']);
     $data = json_decode($res, true);
     $text = $data['choices'][0]['message']['content'] ?? null;
     if ($text === null) throw new Exception('Resposta inesperada do DeepSeek');
@@ -176,23 +146,14 @@ function callDeepSeek(string $system, string $prompt, string $key): string
 
 function httpPost(string $url, string $body, array $headers): string
 {
-    if (!function_exists('curl_init')) {
-        throw new Exception('cURL não disponível no servidor');
-    }
+    if (!function_exists('curl_init')) throw new Exception('cURL não disponível');
     $ch = curl_init($url);
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_POST           => true,
-        CURLOPT_POSTFIELDS     => $body,
-        CURLOPT_HTTPHEADER     => $headers,
-        CURLOPT_TIMEOUT        => 30,
-        CURLOPT_SSL_VERIFYPEER => true,
-    ]);
+    curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER=>true,CURLOPT_POST=>true,CURLOPT_POSTFIELDS=>$body,CURLOPT_HTTPHEADER=>$headers,CURLOPT_TIMEOUT=>30,CURLOPT_SSL_VERIFYPEER=>true]);
     $res  = curl_exec($ch);
     $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $err  = curl_error($ch);
     curl_close($ch);
-    if ($err)         throw new Exception('cURL: ' . $err);
+    if ($err)         throw new Exception('cURL: '.$err);
     if ($code >= 400) throw new Exception("HTTP $code do provedor");
     return (string)$res;
 }

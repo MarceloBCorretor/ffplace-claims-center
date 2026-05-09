@@ -5,20 +5,23 @@
  * NUNCA versione senhas ou tokens reais.
  */
 
-// ─── Banco de Dados (MySQL / MariaDB) ────────────────────────────────
-define('DB_HOST',    'localhost');
-define('DB_NAME',    'rcp_claims');  // rode _config/schema.sql primeiro
-define('DB_USER',    'rcp_user');    // usuário MySQL com acesso ao banco
-define('DB_PASS',    '');            // senha do usuário MySQL
+// ─── Banco de Dados ──────────────────────────────────────────────────────────
+// Suporta variáveis de ambiente (Vercel) ou valores diretos (hospedagem)
+define('DB_HOST',    getenv('DB_HOST') ?: 'localhost');
+define('DB_NAME',    getenv('DB_NAME') ?: 'rcp_claims');
+define('DB_USER',    getenv('DB_USER') ?: 'rcp_user');
+define('DB_PASS',    getenv('DB_PASS') ?: '');
 define('DB_CHARSET', 'utf8mb4');
 
-// ─── Aplicação ───────────────────────────────────────────────────────────
+// ─── Aplicação ────────────────────────────────────────────────────────────────────
 define('APP_TIMEZONE', 'America/Sao_Paulo');
 
-// Token de autenticação para as APIs (header X-App-Token)
-// Deixe vazio para desativar a verificação (apenas rede local/dev)
+// Token de autenticação (Vercel env var ou valor direto)
 // Gere um token com: php -r "echo bin2hex(random_bytes(24));"
-define('APP_TOKEN', '');
+define('APP_TOKEN',      getenv('APP_TOKEN')      ?: '');
+define('ANTHROPIC_KEY',  getenv('ANTHROPIC_KEY')  ?: '');
+define('OPENAI_KEY',     getenv('OPENAI_KEY')      ?: '');
+define('DEEPSEEK_KEY',   getenv('DEEPSEEK_KEY')   ?: '');
 
 date_default_timezone_set(APP_TIMEZONE);
 

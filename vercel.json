@@ -1,0 +1,29 @@
+{
+  "version": 2,
+  "name": "rcp-claims-center",
+  "buildCommand": null,
+  "outputDirectory": ".",
+  "framework": null,
+  "functions": {
+    "api/api_proxy.php":    { "runtime": "vercel-php@0.7.2" },
+    "api/claims-api.php":   { "runtime": "vercel-php@0.7.2" },
+    "api/documents-api.php":{ "runtime": "vercel-php@0.7.2" }
+  },
+  "routes": [
+    { "src": "/api/api_proxy.php",    "dest": "/api/api_proxy.php"    },
+    { "src": "/api/claims-api.php",   "dest": "/api/claims-api.php"   },
+    { "src": "/api/documents-api.php","dest": "/api/documents-api.php"},
+    { "handle": "filesystem" },
+    { "src": "/",                     "dest": "/index.html"           }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options",        "value": "DENY"    },
+        { "key": "Referrer-Policy",        "value": "strict-origin" }
+      ]
+    }
+  ]
+}
