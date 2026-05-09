@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Carta de Encaminhamento — FAI303306</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#e8ecef;color:#1a1a1a;font-size:14px;}
+
+.toolbar{
+  position:sticky;top:0;z-index:100;
+  background:#003366;color:#fff;
+  display:flex;align-items:center;gap:10px;
+  padding:12px 16px;box-shadow:0 2px 8px rgba(0,0,0,.3);
+}
+.toolbar h1{font-size:.95rem;font-weight:600;flex:1;}
+.tbtn{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:7px 13px;border-radius:6px;border:none;
+  font-size:.8rem;cursor:pointer;font-weight:600;transition:opacity .15s;
+}
+.tbtn:hover{opacity:.85;}
+.tbtn-back {background:rgba(255,255,255,.15);color:#fff;}
+.tbtn-print{background:#5c7cfa;color:#fff;}
+.tbtn-pdf  {background:#f26522;color:#fff;}
+
+.page-wrap{display:flex;justify-content:center;padding:24px 12px 48px;}
+#page{
+  background:#fff;width:210mm;max-width:100%;
+  min-height:297mm;padding:20mm 22mm 24mm;
+  box-shadow:0 4px 24px rgba(0,0,0,.15);
+  line-height:1.8;
+}
+
+/* Letterhead */
+.lh{
+  border-bottom:2px solid #003366;padding-bottom:12px;margin-bottom:20px;
+  display:flex;justify-content:space-between;align-items:flex-start;
+}
+.lh-brand{font-size:1.05rem;font-weight:800;color:#003366;}
+.lh-sub  {font-size:.7rem;color:#666;margin-top:3px;line-height:1.5;}
+.lh-right{text-align:right;font-size:.7rem;color:#555;line-height:1.7;}
+
+.date-right{text-align:right;font-size:.85rem;color:#333;margin-bottom:20px;}
+
+.dest{margin-bottom:18px;}
+.dest-lbl{font-size:.7rem;color:#888;text-transform:uppercase;letter-spacing:.05em;}
+.dest-name{font-size:.92rem;font-weight:700;color:#1a1a1a;margin-top:2px;}
+.dest-sub{font-size:.82rem;color:#555;}
+
+.ref{
+  background:#f4f6fa;border-left:3px solid #003366;
+  padding:8px 12px;margin-bottom:18px;
+  font-size:.8rem;color:#333;
+}
+.ref b{color:#003366;}
+
+.body{font-size:.88rem;line-height:1.8;color:#1a1a1a;}
+.body p{margin-bottom:12px;}
+
+.doc-list{margin:14px 0;display:flex;flex-direction:column;gap:7px;}
+.doc-item{display:flex;align-items:center;gap:10px;font-size:.84rem;color:#1a1a1a;}
+.doc-item input[type=checkbox]{width:16px;height:16px;accent-color:#003366;flex-shrink:0;cursor:pointer;}
+.doc-item label{cursor:pointer;}
+
+.closing{margin-top:22px;font-size:.88rem;line-height:1.8;}
+.sig-info{font-size:.82rem;color:#1a1a1a;margin-bottom:26px;line-height:1.6;}
+.sig-line{border-top:1px solid #333;padding-top:5px;font-size:.75rem;color:#555;}
+
+.doc-footer{
+  margin-top:28px;padding-top:8px;border-top:1px solid #eee;
+  display:flex;justify-content:space-between;font-size:.63rem;color:#aaa;
+}
+
+[contenteditable]{outline:none;}
+[contenteditable]:focus{background:#fffbe6;border-radius:2px;}
+
+@media print{
+  .toolbar{display:none!important;}
+  .page-wrap{padding:0;background:none;}
+  #page{box-shadow:none;}
+  @page{size:A4;margin:0;}
+  input[type=checkbox]{appearance:checkbox!important;-webkit-appearance:checkbox!important;}
+}
+@media(max-width:680px){
+  #page{padding:14px;}
+  .lh{flex-direction:column;gap:8px;}
+  .lh-right{text-align:left;}
+}
+</style>
+</head>
+<body>
+
+<div class="toolbar" id="toolbar">
+  <button class="tbtn tbtn-back" onclick="history.back()"><i class="fa fa-arrow-left"></i></button>
+  <h1><i class="fa fa-envelope-open-text" style="margin-right:5px;opacity:.8"></i>Carta de Encaminhamento — FAI303306</h1>
+  <button class="tbtn tbtn-print" onclick="window.print()"><i class="fa fa-print"></i> Imprimir</button>
+  <button class="tbtn tbtn-pdf"   onclick="exportarPDF()"><i class="fa fa-file-pdf"></i> PDF</button>
+</div>
+
+<div class="page-wrap">
+<div id="page">
+
+  <div class="lh">
+    <div>
+      <div class="lh-brand">Mar Del Plata Corretora de Seguros</div>
+      <div class="lh-sub">SUSEP 202031070</div>
+    </div>
+    <div class="lh-right">
+      Sinistro: <b>FAI303306</b><br>
+      Ap.: 47-5-0031448<br>
+      Fairfax Brasil
+    </div>
+  </div>
+
+  <div class="date-right">
+    São Paulo, <span id="dataLong"></span>
+  </div>
+
+  <div class="dest">
+    <div class="dest-lbl">Para</div>
+    <div class="dest-name">Addvalora Regulação de Sinistros</div>
+    <div class="dest-sub">A/C: <span contenteditable="true">Aline R. Lonardoni</span></div>
+    <div class="dest-sub">E-mail: alonardoni@addvaloraglobal.com</div>
+  </div>
+
+  <div class="ref">
+    <b>REF:</b> Encaminhamento de documentação — Sinistro FAI303306<br>
+    Segurado: Dr. Raymundo Nonato Almeida Junior | Cirurgia Bariátrica<br>
+    Apólice: 47-5-0031448 | Seguradora: Fairfax Brasil (FFPlace)
+  </div>
+
+  <div class="body">
+    <p>Prezada <span contenteditable="true">Aline</span>,</p>
+
+    <p>Em cumprimento às obrigações decorrentes do sinistro em referência, encaminhamos em anexo a documentação disponível relativa ao caso do segurado <b>Dr. Raymundo Nonato Almeida Junior</b>, cirurgião bariátrico, referente à ação judicial movida pela paciente <b>Suzana Gonçalves Ferraz</b> (Proc. nº 0012345-67.2025.8.26.0100 — 15ª Vara Cível de São Paulo).</p>
+
+    <p>Seguem os documentos anexados neste encaminhamento:</p>
+
+    <div class="doc-list">
+      <div class="doc-item">
+        <input type="checkbox" id="d1" checked>
+        <label for="d1">1.1 — Aviso de Sinistro RCP (formulário Fairfax preenchido)</label>
+      </div>
+      <div class="doc-item">
+        <input type="checkbox" id="d2" checked>
+        <label for="d2">1.2 — Declaração Addvalora assinada pelo segurado</label>
+      </div>
+      <div class="doc-item">
+        <input type="checkbox" id="d3">
+        <label for="d3">1.3 — Notificação/citação judicial</label>
+      </div>
+      <div class="doc-item">
+        <input type="checkbox" id="d4">
+        <label for="d4">2.1 — Cópia da petição inicial da reclamante</label>
+      </div>
+      <div class="doc-item">
+        <input type="checkbox" id="d5">
+        <label for="d5">2.10 — Prontuário médico completo (em coleta)</label>
+      </div>
+      <div class="doc-item">
+        <input type="checkbox" id="d6">
+        <label for="d6"><span contenteditable="true">Outros documentos: especifique aqui</span></label>
+      </div>
+    </div>
+
+    <p>Permanecemos em coleta dos documentos restantes, com prioridade para o prontuário médico completo (item 2.10), que está sendo providenciado pelo segurado com urgência.</p>
+
+    <p>Colocamo-nos à disposição para quaisquer esclarecimentos adicionais.</p>
+  </div>
+
+  <div class="closing">
+    <p>Atenciosamente,</p>
+  </div>
+
+  <div style="margin-top:24px;">
+    <div class="sig-info">
+      <b>Marcelo Brandão</b><br>
+      Corretor Responsável — SUSEP 202031070<br>
+      Mar Del Plata Corretora de Seguros
+    </div>
+    <div class="sig-line">Assinatura</div>
+  </div>
+
+  <div class="doc-footer">
+    <span>Mar Del Plata Corretora de Seguros · SUSEP 202031070</span>
+    <span>CÓD-CARTA-RCP/REV.A · FAI303306</span>
+  </div>
+
+</div>
+</div>
+
+<script>
+(function(){
+  const d = new Date();
+  document.getElementById('dataLong').textContent =
+    d.toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+})();
+
+async function exportarPDF(){
+  const {jsPDF} = window.jspdf;
+  const page    = document.getElementById('page');
+  const toolbar = document.getElementById('toolbar');
+  toolbar.style.display = 'none';
+  page.style.width = '210mm';
+  try{
+    const canvas = await html2canvas(page,{scale:2,useCORS:true,windowWidth:794,backgroundColor:'#ffffff'});
+    const w = 210;
+    const h = (canvas.height / canvas.width) * w;
+    const pdf = new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+    pdf.addImage(canvas.toDataURL('image/jpeg',.92),'JPEG',0,0,w,Math.min(h,297));
+    pdf.save('Carta-Encaminhamento-FAI303306.pdf');
+  } finally {
+    toolbar.style.display = '';
+    page.style.width = '';
+  }
+}
+</script>
+</body>
+</html>

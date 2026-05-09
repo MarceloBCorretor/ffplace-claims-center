@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Declaração Addvalora — FAI303306</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root {
+  --primary: #003366;
+  --accent: #f26522;
+  --line: #000;
+  --safe-b: env(safe-area-inset-bottom, 0px);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; }
+body { background: #f0f0f0; padding: 20px; padding-bottom: calc(80px + var(--safe-b)); font-size: 11pt; }
+
+.toolbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: #b71c1c; color: white; padding: 12px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  box-shadow: 0 2px 8px rgba(0,0,0,.3);
+}
+.t-title { font-size: 13px; font-weight: 700; }
+.t-sub   { font-size: 11px; opacity: .75; }
+.t-btns  { display: flex; gap: 8px; }
+.t-btn   { padding: 7px 14px; border-radius: 6px; border: none; cursor: pointer; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+.t-back  { background: rgba(255,255,255,.2); color: white; }
+.t-exp   { background: #d32f2f; color: white; border: 2px solid rgba(255,255,255,.5); }
+.t-print { background: rgba(255,255,255,.15); color: white; }
+
+/* A4 container */
+.page {
+  max-width: 210mm; min-height: 297mm;
+  background: white; margin: 68px auto 20px;
+  padding: 20mm 25mm;
+  box-shadow: 0 4px 20px rgba(0,0,0,.15);
+  box-sizing: border-box;
+  display: flex; flex-direction: column;
+}
+
+/* Logo Addvalora */
+.logo-addvalora { max-width: 220px; height: auto; margin-bottom: 36px; }
+
+/* Title */
+.doc-title {
+  text-align: center; font-weight: bold;
+  text-transform: uppercase; text-decoration: underline;
+  font-size: 12pt; margin-bottom: 30px;
+}
+
+/* Body text */
+.txt { text-align: justify; margin-bottom: 16px; font-size: 11pt; line-height: 1.6; color: #222; }
+.editable {
+  background: #fffde7; padding: 0 4px;
+  border-bottom: 1px dashed #999; color: #000;
+  font-weight: bold; outline: none;
+  display: inline-block; min-width: 80px;
+}
+.editable:focus { background: #fff9c4; box-shadow: inset 0 0 0 1px #f9a825; }
+
+/* Form fields */
+.field-row { display: flex; align-items: baseline; margin-bottom: 10px; gap: 6px; }
+.field-lbl { font-weight: bold; white-space: nowrap; font-size: 11pt; }
+.field-line { flex-grow: 1; border-bottom: 1px solid var(--line); min-height: 22px; font-weight: bold; padding-left: 5px; background: #fffde7; outline: none; font-size: 11pt; }
+.field-line:focus { background: #fff9c4; }
+
+/* Date */
+.date-area { margin-top: 30px; margin-bottom: 50px; font-size: 11pt; line-height: 2; }
+
+/* Signature */
+.sig-section { margin-top: auto; }
+.sig-wrap {
+  width: 100%; max-width: 360px;
+  height: 90px; border-bottom: 1px solid var(--line);
+  position: relative; cursor: crosshair; background: transparent;
+}
+.sig-wrap canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; }
+.sig-hint { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); color: #ccc; font-size: 9pt; pointer-events: none; }
+.sig-line-label { border-top: 1px solid var(--line); padding-top: 5px; font-weight: bold; font-size: 10pt; margin-top: 2px; }
+.btn-clear { margin-top: 5px; padding: 4px 10px; font-size: 10px; background: #d32f2f; color: white; border: none; border-radius: 3px; cursor: pointer; }
+
+/* Loading */
+.loading { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 9999; align-items: center; justify-content: center; }
+.loading.on { display: flex; }
+.lbox { background: white; border-radius: 12px; padding: 28px 24px; text-align: center; }
+.spin { width: 40px; height: 40px; border: 4px solid #eee; border-top-color: #b71c1c; border-radius: 50%; animation: sp .8s linear infinite; margin: 0 auto 12px; }
+@keyframes sp { to { transform: rotate(360deg); } }
+
+@media (max-width: 600px) {
+  body { padding: 10px; }
+  .page { padding: 14px; margin-top: 68px; min-height: auto; }
+  .field-row { flex-direction: column; align-items: stretch; }
+  .field-line { border: 1px solid #ccc; border-radius: 4px; padding: 5px; }
+}
+@media print {
+  .toolbar, .btn-clear, .no-print { display: none !important; }
+  body { background: white; padding: 0; }
+  @page { size: A4; margin: 2cm; }
+  .page { box-shadow: none; margin: 0; padding: 0; min-height: auto; max-width: 100%; }
+  .field-line, .editable { background: transparent !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="loading" id="loading">
+  <div class="lbox"><div class="spin"></div><div style="font-weight:700;color:#b71c1c">Gerando PDF...</div></div>
+</div>
+
+<!-- Toolbar Addvalora (vermelho da marca) -->
+<div class="toolbar">
+  <div>
+    <div class="t-title">Declaração Addvalora</div>
+    <div class="t-sub">Inexistência de Outros Seguros — FAI303306</div>
+  </div>
+  <div class="t-btns">
+    <button class="t-btn t-back" onclick="history.back()"><i class="fas fa-chevron-left"></i>&nbsp;Voltar</button>
+    <button class="t-btn t-print no-print" onclick="window.print()"><i class="fas fa-print"></i>&nbsp;Imprimir</button>
+    <button class="t-btn t-exp no-print" onclick="exportarPDF()"><i class="fas fa-file-pdf"></i>&nbsp;PDF</button>
+  </div>
+</div>
+
+<!-- A4 PAGE -->
+<div class="page" id="pdfPage">
+
+  <!-- Logo Addvalora -->
+  <img src="https://seuatendimento.info/propostas/danielamelo/advalora.png"
+       alt="Addvalora Global Loss Adjusters"
+       class="logo-addvalora" crossorigin="anonymous">
+
+  <div class="doc-title">Declaração de Inexistência de Outros Seguros</div>
+
+  <div class="txt">
+    <strong>Raymundo Nonato Almeida Junior</strong>,
+    médico ortopedista, inscrito no CRM/RO sob o nº
+    <span class="editable" contenteditable="true" title="Informe o CRM">____/RO</span>,
+    residente e domiciliado em Cacoal/RO,
+    declaro (amos) para os devidos fins que não possuo (imos) outros contratos de seguros
+    amparando os mesmos bens e riscos envolvidos pelo sinistro na ocorrência referente à
+    <strong>cirurgia de osteossíntese de fêmur realizada em 12/11/2024</strong>,
+    objeto do processo judicial nº 7018395-37.2025.8.22.0007
+    (1ª Vara Cível de Cacoal/RO),
+    sob pena de perda de direitos a qualquer indenização.
+  </div>
+
+  <div class="txt">Por ser expressão da verdade, firmo (amos) a presente,</div>
+
+  <!-- Campos do formulário -->
+  <div style="margin-top: 20px">
+    <div class="field-row">
+      <span class="field-lbl">Razão Social / Nome completo:</span>
+      <div class="field-line" contenteditable="true">Raymundo Nonato Almeida Junior</div>
+    </div>
+    <div class="field-row">
+      <span class="field-lbl">CNPJ / CPF:</span>
+      <div class="field-line" contenteditable="true"></div>
+    </div>
+    <div class="field-row">
+      <span class="field-lbl">Número do sinistro:</span>
+      <div class="field-line" contenteditable="true">FAI303306</div>
+    </div>
+    <div class="field-row">
+      <span class="field-lbl">Apólice:</span>
+      <div class="field-line" contenteditable="true">10078·····888 — RC Profissional Médico (FF Orbi)</div>
+    </div>
+  </div>
+
+  <!-- Data -->
+  <div class="date-area">
+    Cacoal/RO,
+    <span class="editable" contenteditable="true" id="dia"></span> de
+    <span class="editable" contenteditable="true" id="mes"></span> de
+    <span class="editable" contenteditable="true" id="ano"></span>.
+  </div>
+
+  <!-- Assinatura -->
+  <div class="sig-section">
+    <div class="sig-wrap" id="sigWrap">
+      <span class="sig-hint" id="sigHint">Assinar aqui</span>
+      <canvas id="sigCanvas"></canvas>
+    </div>
+    <div class="sig-line-label">Responsável — Dr. Raymundo Nonato Almeida Junior</div>
+    <div class="no-print" style="margin-top:8px;display:flex;gap:8px">
+      <button class="btn-clear" onclick="limpar()"><i class="fas fa-eraser"></i>&nbsp;Limpar</button>
+      <button class="btn-clear" style="background:#1976d2" onclick="confirmarAssinatura()"><i class="fas fa-check"></i>&nbsp;Confirmar</button>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+// Data auto
+const hoje = new Date();
+const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+document.getElementById('dia').textContent  = hoje.getDate();
+document.getElementById('mes').textContent  = meses[hoje.getMonth()];
+document.getElementById('ano').textContent  = hoje.getFullYear();
+
+// Signature
+const canvas = document.getElementById('sigCanvas');
+const ctx    = canvas.getContext('2d');
+const wrap   = document.getElementById('sigWrap');
+let drawing  = false;
+
+function resizeSig() {
+  const dpr = window.devicePixelRatio || 1;
+  const r = wrap.getBoundingClientRect();
+  canvas.width  = r.width  * dpr;
+  canvas.height = r.height * dpr;
+  ctx.scale(dpr, dpr);
+  ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.strokeStyle = '#000';
+}
+setTimeout(resizeSig, 100);
+window.addEventListener('resize', resizeSig);
+
+function getPos(e) {
+  const r = canvas.getBoundingClientRect();
+  const s = e.touches ? e.touches[0] : e;
+  return { x: s.clientX - r.left, y: s.clientY - r.top };
+}
+let lx = 0, ly = 0;
+function start(e) { drawing = true; const p = getPos(e); lx = p.x; ly = p.y; document.getElementById('sigHint').style.display = 'none'; if(e.type==='touchstart') e.preventDefault(); }
+function move(e)  { if(!drawing) return; const p = getPos(e); ctx.beginPath(); ctx.moveTo(lx,ly); ctx.lineTo(p.x,p.y); ctx.stroke(); lx=p.x; ly=p.y; if(e.type==='touchmove') e.preventDefault(); }
+function stop()   { drawing = false; }
+function limpar() { ctx.clearRect(0,0,canvas.width,canvas.height); document.getElementById('sigHint').style.display='block'; }
+function confirmarAssinatura() {
+  const data = canvas.toDataURL('image/png');
+  const img = document.createElement('img');
+  img.src = data; img.style.height='80px'; img.style.marginBottom='-15px';
+  wrap.innerHTML = ''; wrap.appendChild(img);
+  document.querySelector('.no-print').style.display='none';
+}
+canvas.addEventListener('mousedown', start); canvas.addEventListener('mousemove', move); canvas.addEventListener('mouseup', stop); canvas.addEventListener('mouseout', stop);
+canvas.addEventListener('touchstart', start, {passive:false}); canvas.addEventListener('touchmove', move, {passive:false}); canvas.addEventListener('touchend', stop);
+
+async function exportarPDF() {
+  const ld = document.getElementById('loading');
+  ld.classList.add('on');
+  try {
+    document.querySelectorAll('.no-print').forEach(el => el.style.display='none');
+    const pg = document.getElementById('pdfPage');
+    const cv = await html2canvas(pg, { scale:2, useCORS:true, backgroundColor:'#fff', logging:false, windowWidth:900 });
+    const img = cv.toDataURL('image/jpeg', 0.95);
+    const pdf = new window.jspdf.jsPDF('p','mm','a4');
+    const pw = pdf.internal.pageSize.getWidth();
+    const ph = (cv.height * pw) / cv.width;
+    pdf.addImage(img,'JPEG',0,0,pw,ph);
+    const nome = 'Declaracao_Addvalora_FAI303306.pdf';
+    const blob = pdf.output('blob');
+    const file = new File([blob], nome, {type:'application/pdf'});
+    if (navigator.canShare && navigator.canShare({files:[file]})) {
+      await navigator.share({files:[file], title:'Declaração Addvalora'});
+    } else {
+      pdf.save(nome);
+    }
+  } catch(e) {
+    alert('Erro ao gerar PDF.'); console.error(e);
+  } finally {
+    ld.classList.remove('on');
+    document.querySelectorAll('.no-print').forEach(el => el.style.display='');
+  }
+}
+</script>
+</body>
+</html>

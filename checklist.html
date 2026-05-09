@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#003366">
+<title>Checklist Documental — RCP Claims</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="assets/css/rcp-core.css">
+<style>
+.overall-bar {
+  background: var(--c-card); border-radius: var(--r-lg);
+  padding: 16px; box-shadow: var(--sh); margin: 14px 0;
+  border-top: 4px solid var(--c-primary);
+}
+.overall-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.overall-title { font-size: 14px; font-weight: 700; color: var(--c-primary); }
+.overall-count { font-size: 1.4rem; font-weight: 700; color: var(--c-primary); }
+.phase-card {
+  background: var(--c-card); border-radius: var(--r-lg);
+  box-shadow: var(--sh); margin-bottom: 12px; overflow: hidden;
+}
+.phase-hdr {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 15px; cursor: pointer;
+  border-left: 5px solid var(--c-border); transition: all 0.2s;
+  user-select: none;
+}
+.phase-hdr.open     { border-left-color: var(--c-primary); }
+.phase-hdr.complete { border-left-color: var(--c-success); }
+.phase-hdr.urgent   { border-left-color: var(--c-danger); }
+.phase-num {
+  width: 30px; height: 30px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; flex-shrink: 0;
+  background: var(--c-primary-light); color: var(--c-primary);
+}
+.phase-num.done { background: #d4edda; color: #155724; }
+.phase-num.urgent { background: #f8d7da; color: #721c24; }
+.phase-info { flex: 1; min-width: 0; }
+.phase-name { font-size: 13px; font-weight: 700; color: var(--c-primary); }
+.phase-sub  { font-size: 11px; color: var(--c-muted); margin-top: 1px; }
+.phase-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.phase-pct  { font-size: 12px; font-weight: 700; }
+.chevron { color: var(--c-muted); transition: transform 0.3s; }
+.chevron.open { transform: rotate(180deg); }
+.phase-progress-wrap { padding: 0 15px 6px; }
+.phase-body { display: none; }
+.phase-body.open { display: block; }
+.doc-row {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 12px 15px; border-top: 1px solid var(--c-bg);
+}
+.doc-ico  { font-size: 15px; flex-shrink: 0; margin-top: 2px; }
+.doc-info { flex: 1; min-width: 0; }
+.doc-name { font-size: 13px; font-weight: 600; line-height: 1.3; }
+.doc-desc { font-size: 11px; color: var(--c-muted); margin-top: 2px; line-height: 1.4; }
+.doc-tag  { font-size: 10px; font-weight: 700; color: var(--c-primary); margin-top: 3px; display: inline-flex; align-items: center; gap: 3px; }
+.doc-tag.addvalora { color: #b45309; }
+.doc-actions { display: flex; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
+.doc-st { flex-shrink: 0; margin-top: 2px; }
+.cond-box { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 10px; margin-top: 8px; }
+.cond-q   { font-size: 12px; font-weight: 600; color: #92400e; margin-bottom: 8px; }
+.cond-row { display: flex; gap: 7px; }
+.cond-b   { flex:1; padding: 7px 5px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; background: white; transition: all .15s; }
+.cond-b.yes { border: 2px solid #16a34a; color: #16a34a; }
+.cond-b.yes.sel { background: #16a34a; color: white; }
+.cond-b.no  { border: 2px solid #dc2626; color: #dc2626; }
+.cond-b.no.sel  { background: #dc2626; color: white; }
+.cond-resp { margin-top: 8px; display: none; }
+.filter-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; scrollbar-width: none; }
+.filter-bar::-webkit-scrollbar { display: none; }
+.f-chip { flex-shrink:0; padding: 6px 13px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1.5px solid var(--c-border); background: var(--c-card); color: var(--c-muted); cursor: pointer; transition: all .2s; }
+.f-chip.active { background: var(--c-primary); color: white; border-color: var(--c-primary); }
+</style>
+</head>
+<body>
+<div class="app-layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">RCP <span>Claims</span> Center<br><small style="color:rgba(255,255,255,.4);font-weight:400">Mar Del Plata Corretora</small></div>
+    <nav>
+      <a href="index.html"      class="nav-link"><i class="fas fa-th-large"></i> Dashboard</a>
+      <a href="sinistro.html"   class="nav-link"><i class="fas fa-file-medical-alt"></i> Sinistros</a>
+      <a href="checklist.html"  class="nav-link active"><i class="fas fa-clipboard-check"></i> Documentos</a>
+      <a href="analise-ia.html" class="nav-link"><i class="fas fa-robot"></i> Análise IA</a>
+      <a href="mensagens.html"  class="nav-link"><i class="fas fa-comments"></i> Mensagens</a>
+      <a href="documentos.html" class="nav-link"><i class="fas fa-file-pdf"></i> Gerar Docs</a>
+    </nav>
+    <div class="sidebar-footer">SUSEP 202031070<br>FFPlace · Fairfax Brasil</div>
+  </aside>
+  <div>
+    <header class="app-header">
+      <div class="header-brand">
+        <button onclick="location.href='sinistro.html'" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:white;width:34px;height:34px;border-radius:8px;font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <div>
+          <div class="header-title">Checklist Documental</div>
+          <div class="header-sub">FAI303306 — Addvalora / Fairfax</div>
+        </div>
+      </div>
+      <div class="header-badge"><i class="fas fa-paperclip"></i>&nbsp;2/23</div>
+    </header>
+    <div class="container">
+
+      <!-- Overall progress -->
+      <div class="overall-bar">
+        <div class="overall-row">
+          <div>
+            <div class="overall-title">Progresso Total</div>
+            <div style="font-size:12px;color:var(--c-muted)">Dr. Raymundo — FAI303306</div>
+          </div>
+          <div class="overall-count">2<span style="font-size:1rem;color:var(--c-muted);font-weight:400">/23</span></div>
+        </div>
+        <div class="progress-label">
+          <span>Documentos concluídos</span>
+          <span style="color:var(--c-danger);font-weight:700">8.7%</span>
+        </div>
+        <div class="progress-wrap"><div class="progress-fill" style="width:8.7%"></div></div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px">
+          <div style="text-align:center">
+            <div style="font-size:1rem;font-weight:700;color:var(--c-success)">2</div>
+            <div style="font-size:10px;color:var(--c-muted)">Concluídos</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:1rem;font-weight:700;color:var(--c-danger)">16</div>
+            <div style="font-size:10px;color:var(--c-muted)">Pendentes</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:1rem;font-weight:700;color:var(--c-warning)">5</div>
+            <div style="font-size:10px;color:var(--c-muted)">Condicionais</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:1rem;font-weight:700;color:var(--c-muted)">1</div>
+            <div style="font-size:10px;color:var(--c-muted)">N/A</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <button class="f-chip active">Todas as fases</button>
+        <button class="f-chip">Fase 1 — Abertura</button>
+        <button class="f-chip">Fase 2 — Addvalora</button>
+        <button class="f-chip">Fase 3 — Defesa</button>
+        <button class="f-chip">Fase 4 — Encerramento</button>
+      </div>
+
+      <div class="alert alert-danger">
+        <i class="fas fa-exclamation-triangle"></i>
+        <div><strong>Fase 2 crítica:</strong> 9 de 11 documentos solicitados pela Addvalora estão pendentes. Prontuário clínico (2.10) é o item mais urgente para análise de cobertura.</div>
+      </div>
+
+      <!-- FASE 1 -->
+      <div class="phase-card">
+        <div class="phase-hdr open" onclick="togglePhase(this)">
+          <div class="phase-num">1</div>
+          <div class="phase-info">
+            <div class="phase-name">Fase 1 — Abertura do Sinistro</div>
+            <div class="phase-sub">Documentação inicial obrigatória</div>
+          </div>
+          <div class="phase-right">
+            <span class="badge badge-warning">1/4</span>
+            <i class="fas fa-chevron-down chevron open"></i>
+          </div>
+        </div>
+        <div class="phase-progress-wrap">
+          <div class="progress-wrap"><div class="progress-fill" style="width:25%"></div></div>
+        </div>
+        <div class="phase-body open">
+          <div class="doc-row">
+            <span class="doc-ico">✅</span>
+            <div class="doc-info">
+              <div class="doc-name">1.1 — Aviso de Sinistro preenchido e assinado</div>
+              <div class="doc-desc">Relato completo da ocorrência, datas do procedimento e da citação</div>
+              <div class="doc-tag"><i class="fas fa-star"></i>Gerado pelo sistema</div>
+            </div>
+            <span class="doc-st"><span class="badge badge-success">OK</span></span>
+          </div>
+          <div class="doc-row">
+            <span class="doc-ico">⭕</span>
+            <div class="doc-info">
+              <div class="doc-name">1.2 — Cópia da apólice vigente</div>
+              <div class="doc-desc">Apólice 10078·····888 — RC Profissional Médico (FF Orbi)</div>
+              <div class="doc-actions">
+                <button class="btn btn-outline btn-sm"><i class="fas fa-upload"></i>&nbsp;Enviar</button>
+              </div>
+            </div>
+            <span class="doc-st"><span class="badge badge-warning">Pend.</span></span>
+          </div>
+          <div class="doc-row">
+            <span class="doc-ico">⭕</span>
+            <div class="doc-info">
+              <div class="doc-name">1.3 — CRM / Registro Profissional</div>
+              <div class="doc-desc">Certidão de regularidade no CRM/RO</div>
+              <div class="doc-actions">
+                <button class="btn btn-outline btn-sm"><i class="fas fa-upload"></i>&nbsp;Enviar</button>
+              </div>
+            </div>
+            <span class="doc-st"><span class="badge badge-warning">Pend.</span></span>
+          </div>
+          <div class="doc-row">
+            <span class="doc-ico">⭕</span>
+            <div class="doc-info">
+              <div class="doc-name">1.4 — Documentos pessoais do segurado</div>
+              <div class="doc-desc">RG e CPF — cópias legibles</div>
+              <div class="doc-actions">
+                <button class="btn btn-outline btn-sm"><i class="fas fa-upload"></i>&nbsp;Enviar</button>
+              </div>
+            </div>
+            <span class="doc-st"><span class="badge badge-warning">Pend.</span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- FASE 2 -->
+      <div class="phase-card">
+        <div class="phase-hdr urgent open" onclick="togglePhase(this)">
+          <div class="phase-num urgent"><i class="fas fa-exclamation" style="font-size:11px"></i></div>
+          <div class="phase-info">
+            <div class="phase-name">Fase 2 — Regulação Addvalora <span class="badge badge-danger" style="margin-left:6px;font-size:9px">URGENTE</span></div>
+            <div class="phase-sub">Solicitado por Aline R. Lonardoni — Addvalora Brasil</div>
+          </div>
+          <div class="phase-right">
+            <span class="badge badge-danger">2/11</span>
+            <i class="fas fa-chevron-down chevron open"></i>
+          </div>
+        </div>
+        <div class="phase-progress-wrap">
+          <div class="progress-wrap"><div class="progress-fill" style="width:18%"></div></div>
+        </div>
+        <div class="phase-body open">
+
+          <div class="doc-row">
+            <span class="doc-ico">✅</span>
+            <div class="doc-info">
+              <div class="doc-name">2.1 — Aviso de Sinistro com relato detalhado</div>
+              <div class="doc-desc">Data do procedimento (12/11/2024) + data da citação + assinatura</div>
+              <div class="doc-tag addvalora"><i class="fas fa-building"></i>Exigido por Addvalora</div>
+              <div class="doc-tag"><i class="fas fa-star"></i>Gerado pelo sistema</div>
+            </div>
+            <span class="doc-st"><span class="badge badge-success">OK</span></span>
+          </div>
+
+          <div class="doc-row">
+            <span class="doc-ico">⭕</span>
+            <div class="doc-info">
+              <div class="doc-name">2.2 — Declaração de Inexistência de Outros Seguros</div>
+              <div class="doc-desc">Modelo Addvalora — assinatura do segurado obrigatória</div>
+              <div class="doc-tag addvalora"><i class="fas fa-building"></i>Exigido por Addvalora</div>
+              <div class="doc-tag"><i class="fas fa-star"></i>Gerado pelo sistema</div>
+              <div class="doc-actions">
+                <a href="templates/declaracao-addvalora.html" target="_blank" class="btn btn-primary btn-sm"><i class="fas fa-pen"></i>&nbsp;Gerar e Assinar</a>
+                <a href="documentos.html" class="btn btn-ghost btn-sm"><i class="fas fa-eye"></i>&nbsp;Ver docs</a>
+              </div>
+            </div>
+            <span class="doc-st"><span class="badge badge-warning">Pend.</span></span>
+          </div>
+
+          <div class="doc-row">
+            <span class="doc-ico">⚡</span>
+            <div class="doc-info">
+              <div class="doc-name">2.3 — Reclamação Formal Extrajudicial</div>
+              <div class="doc-desc">SAC, Ouvidoria, WhatsApp, BO ou outro meio de contato anterior à ação</div>
+              <div class="doc-tag addvalora"><i class="fas fa-building"></i>Exigido por Addvalora</div>
+              <div class="cond-box">
+                <div class="cond-q">Houve reclamação formal do Sr. Izaias antes da ação judicial?</div>
+                <div class="cond-row">
+                  <button class="cond-b yes" onclick="setCond(this,'cr23','yes')">✅ Sim, houve</button>
+                  <button class="cond-b no"  onclick="setCond(this,'cr23','no')">❌ Não houve</button>
+                </div>
+                <div class="cond-resp" id="cr23"></div>
+              </div>
+            </div>
+            <span class="doc-st"><span class="badge badge-accent">⚡ Cond.</span></span>
+          </div>
+
+          <div class="doc-row">
+            <span class="doc-ico">⭕</span>
+            <div class="doc-info">
+              <div class="doc-name">2.4 — Cópia Integral da Ação Judicial</div>
+              <div class="doc-desc">Processo 7018395-37.2025.8.22.0007 — todas as peças em PDF</div>
+              <div class="doc-tag addvalora"><i class="fas fa-building"></i>Exigido por Addvalora</div>
+              <div class="doc-actions">
+                <button class="btn btn-outline btn-sm"><i class="fas fa-upload"></i>&nbsp;Enviar PDF</button>
+              </div>
+            </div>
+            <span class="doc-st"><span class="badge badge-warning">Pend.</span></span>
+          </div>
+
+          <div class="doc-row">
+            <span class="doc-ico">⚡</span>
+            <div class="doc-info">
+              <div class="doc-name">2.5 — Procedimento Administrativo (CRM/CFM)</div>
+              <div class="doc-desc">Há processo administrativo em curso em face do segurado?</div>
+              <div class="doc-tag addvalora"><i class="fas fa-building"></i>Exigido por Addvalora</div>
+              <div class="cond-box">
+                <div class="cond-q">Existe procedimento administrativo em curso no CRM ou CFM?</div>
+                <div class="cond-row">
+                  <button class="cond-b yes" onclick="setCond(this,'cr25','yes')">✅ Sim</button>
+                  <button class="cond-b no"  onclick="setCond(this,'cr25','no')">❌ Não</button>
+                </div>
+                <div class="cond-resp" id="cr25"></div>
+              </div>
+            </div>
+            <span class="doc-st"><span class="badge badge-accent">⚡ Cond.</span></span>
+          </div>
+
+          <div class="doc-row">
+            <span class="doc-ico">⚡</span>
+            <div class="doc-info">
+              <div class="doc-name">2.6 — Procedimento Criminal</div>
+              <div class="doc-desc">Notificação de inquérito policial ou processo criminal</div>
+              <div class="doc-tag addvalora"><i class="fas fa-building"></i>Exigido por Addvalora</div>
+              <div class="cond-box">
+                <div class="cond-q">O segurado foi notificado de procedimento criminal relacionado?</div>
+                <div class="cond-row">
+                  <button class="cond-b yes" onclick="setCond(this,'cr26','yes')">✅ Sim</button>
+                  <button class="cond-b no"  onclick="setCond(this,'cr26','no')">❌ Não</button>
+                </div>
+                <div class="cond-resp" id="cr26"></div>
+              </div>
+            </div>
+            <span class="doc-st"><span class="badge badge-accent">⚡ Cond.</span></span>
+          </div>
+
+          <div class="doc-row">
+            <span class="doc-ico">⭕</span>
+            <div class="doc-info">
+              <div class="doc-name">2.7 — Cópia da Citação Recebida</div>
+              <div class="doc-desc">Obrigatório se qualquer um dos itens 2.3, 2.5 ou 2.6 for positivo</div>
+              <div class="doc-tag addvalora"><i class="fas fa-building"></i>Exigido por Addvalora</div>
+              <div class="doc-actions">
+                <button class="btn btn-outline btn-sm"><i class="fas fa-upload"></i>&nbsp;Enviar</button>
+              </div>
+            </div>
+            <span class="doc-st"><span class="badge badge-warning">Pend.</span></span>
+          </div>
+
+          <div class="doc-row">
+            <span class="doc-ico">⚡</span>
+            <div class="doc-info">
+              <div class="doc-name">2.8 — Tratativas com Terceiro (WA / e-mail)</div>
+              <div class="doc-desc">Print ou exportação de conversas com o reclamante Izaias do Amaral</div>
+              <div class="doc-tag addvalora"><i class="fas fa-building"></i>Exigido por Addvalora</div>
+              <div class="cond-box">
+                <div class="cond-q">Houve contato direto entre o segurado e o reclamante?</div>
+                <div class="cond-row">
+                  <button class="cond-b yes" onclick="setCond(this,'cr28','yes')">✅ Sim, houve</button>
+                  <button class="cond-b no"  onclick="setCond(this,'cr28','no')">❌ Não houve</button>
+                </div>
+                <div class="cond-resp" id="cr28"></div>
+              </div>
+            </div>
+            <span class="doc-st"><span class="badge badge-accent">⚡ Cond.</span></span>
+          </div>
+
+          <div class="doc-row">
+            <span class="doc-ico">⭕</span>
+            <div class="doc-info">
+              <div class="doc-name">2.9 — Documentos do Profissional</div>
+              <div class="doc-desc">CRM · Diplomas e Especialidades · Comprovante de endereço (máx. 90 dias)</div>
+              <div class="doc-tag addvalora"><i class="fas fa-building"></i>Exigido por Addvalora</div>
+              <div class="doc-actions">
+                <button class="btn btn-outline btn-sm"><i class="fas fa-id-card"></i>&nbsp;CRM</button>
+                <button class="btn btn-outline btn-sm"><i class="fas fa-graduation-cap"></i>&nbsp;Diploma</button>
+                <button class="btn btn-outline btn-sm"><i class="fas fa-home"></i>&nbsp;Endereço</button>
+              </div>
+            </div>
+            <span class="doc-st"><span class="badge badge-warning">0/3</span></span>
+          </div>
+
+          <div class="doc-row" style="background:#fef2f2;border-radius:0">
+            <span class="doc-ico">⭕</span>
+            <div class="doc-info">
+              <div class="doc-name" style="color:var(--c-danger)">2.10 — Prontuário Clínico Completo <span class="badge badge-danger" style="margin-left:4px">CRÍTICO</span></div>
+              <div class="doc-desc">Descritivo cirúrgico · Prescrições · Exames de imagem pré e pós-operatório</div>
+              <div class="doc-tag addvalora"><i class="fas fa-building"></i>Exigido por Addvalora — determinante para cobertura</div>
+              <div class="doc-actions">
+                <button class="btn btn-primary btn-sm"><i class="fas fa-upload"></i>&nbsp;Enviar prontuário</button>
+              </div>
+            </div>
+            <span class="doc-st"><span class="badge badge-danger">Urgente</span></span>
+          </div>
+
+          <div class="doc-row">
+            <span class="doc-ico">⭕</span>
+            <div class="doc-info">
+              <div class="doc-name">2.11 — Exames de Imagem (pré e pós-operatório)</div>
+              <div class="doc-desc">Podem ser incluídos no prontuário (2.10) ou enviados separadamente</div>
+              <div class="doc-tag addvalora"><i class="fas fa-building"></i>Exigido por Addvalora</div>
+              <div class="doc-actions">
+                <button class="btn btn-outline btn-sm"><i class="fas fa-x-ray"></i>&nbsp;Enviar exames</button>
+              </div>
+            </div>
+            <span class="doc-st"><span class="badge badge-warning">Pend.</span></span>
+          </div>
+
+          <div style="margin:12px 15px;padding:10px 12px;background:#f8f9fa;border-radius:7px;border:1px solid var(--c-border);font-size:11px;color:var(--c-muted);line-height:1.5">
+            <strong>Contato Addvalora:</strong> Aline Rodrigues Lonardoni —
+            <a href="mailto:alonardoni@addvaloraglobal.com" style="color:var(--c-primary)">alonardoni@addvaloraglobal.com</a>
+            — (11) 4324-2870 | (41) 99693-6421<br>
+            <strong>Obs.:</strong> A solicitação de documentos não vincula a Seguradora ao pagamento de indenização.
+          </div>
+        </div>
+      </div>
+
+      <!-- FASE 3 -->
+      <div class="phase-card">
+        <div class="phase-hdr" onclick="togglePhase(this)">
+          <div class="phase-num">3</div>
+          <div class="phase-info">
+            <div class="phase-name">Fase 3 — Defesa Judicial</div>
+            <div class="phase-sub">Documentação para contestação e perícia</div>
+          </div>
+          <div class="phase-right">
+            <span class="badge badge-warning">0/4</span>
+            <i class="fas fa-chevron-down chevron"></i>
+          </div>
+        </div>
+        <div class="phase-progress-wrap">
+          <div class="progress-wrap"><div class="progress-fill" style="width:0%"></div></div>
+        </div>
+        <div class="phase-body">
+          <div class="doc-row">
+            <span class="doc-ico">⭕</span>
+            <div class="doc-info">
+              <div class="doc-name">3.1 — Contestação judicial</div>
+              <div class="doc-desc">Peça de defesa do escritório Cândido &amp; Henrique</div>
+              <div class="doc-actions"><button class="btn btn-outline btn-sm"><i class="fas fa-upload"></i>&nbsp;Enviar</button></div>
+            </div>
+            <span class="doc-st"><span class="badge badge-warning">Pend.</span></span>
+          </div>
+          <div class="doc-row">
+            <span class="doc-ico">⭕</span>
+            <div class="doc-info">
+              <div class="doc-name">3.2 — Laudo pericial médico</div>
+              <div class="doc-desc">Parecer técnico sobre o procedimento realizado</div>
+              <div class="doc-actions"><button class="btn btn-outline btn-sm"><i class="fas fa-upload"></i>&nbsp;Enviar</button></div>
+            </div>
+            <span class="doc-st"><span class="badge badge-warning">Pend.</span></span>
+          </div>
+          <div class="doc-row">
+            <span class="doc-ico">➖</span>
+            <div class="doc-info">
+              <div class="doc-name">3.3 — Contra-laudo</div>
+              <div class="doc-desc">Enviar somente se necessário após perícia do autor</div>
+            </div>
+            <span class="doc-st"><span class="badge badge-info">N/A</span></span>
+          </div>
+          <div class="doc-row">
+            <span class="doc-ico">⭕</span>
+            <div class="doc-info">
+              <div class="doc-name">3.4 — Exames de imagem adicionais</div>
+              <div class="doc-desc">Raio-X, ressonância e demais exames de imagem do caso</div>
+              <div class="doc-actions"><button class="btn btn-outline btn-sm"><i class="fas fa-upload"></i>&nbsp;Enviar</button></div>
+            </div>
+            <span class="doc-st"><span class="badge badge-warning">Pend.</span></span>
+          </div>
+          <div class="doc-row">
+            <span class="doc-ico">⭕</span>
+            <div class="doc-info">
+              <div class="doc-name">3.5 — Relatório de evolução pós-operatória</div>
+              <div class="doc-desc">Acompanhamento clínico após a cirurgia de osteossíntese</div>
+              <div class="doc-actions"><button class="btn btn-outline btn-sm"><i class="fas fa-upload"></i>&nbsp;Enviar</button></div>
+            </div>
+            <span class="doc-st"><span class="badge badge-warning">Pend.</span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- FASE 4 -->
+      <div class="phase-card">
+        <div class="phase-hdr" onclick="togglePhase(this)">
+          <div class="phase-num">4</div>
+          <div class="phase-info">
+            <div class="phase-name">Fase 4 — Encerramento</div>
+            <div class="phase-sub">Desfecho e liquidação do sinistro</div>
+          </div>
+          <div class="phase-right">
+            <span class="badge badge-info">0/3</span>
+            <i class="fas fa-chevron-down chevron"></i>
+          </div>
+        </div>
+        <div class="phase-progress-wrap">
+          <div class="progress-wrap"><div class="progress-fill" style="width:0%"></div></div>
+        </div>
+        <div class="phase-body">
+          <div class="doc-row">
+            <span class="doc-ico">⭕</span>
+            <div class="doc-info">
+              <div class="doc-name">4.1 — Sentença ou acordo homologado</div>
+              <div class="doc-desc">Decisão judicial final ou termo de acordo</div>
+              <div class="doc-actions"><button class="btn btn-outline btn-sm"><i class="fas fa-upload"></i>&nbsp;Enviar</button></div>
+            </div>
+            <span class="doc-st"><span class="badge badge-info">Aguard.</span></span>
+          </div>
+          <div class="doc-row">
+            <span class="doc-ico">⭕</span>
+            <div class="doc-info">
+              <div class="doc-name">4.2 — Comprovante de pagamento</div>
+              <div class="doc-desc">Se aplicável após sentença condenatória</div>
+              <div class="doc-actions"><button class="btn btn-outline btn-sm"><i class="fas fa-upload"></i>&nbsp;Enviar</button></div>
+            </div>
+            <span class="doc-st"><span class="badge badge-info">Aguard.</span></span>
+          </div>
+          <div class="doc-row">
+            <span class="doc-ico">⭕</span>
+            <div class="doc-info">
+              <div class="doc-name">4.3 — Relatório final da reguladora</div>
+              <div class="doc-desc">Encerramento formal pela Addvalora Brasil</div>
+            </div>
+            <span class="doc-st"><span class="badge badge-info">Aguard.</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-group mb-16">
+        <a href="documentos.html" class="btn btn-accent btn-full">
+          <i class="fas fa-file-pdf"></i>&nbsp;Gerar Documentos Oficiais
+        </a>
+      </div>
+
+    </div><!-- /container -->
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <button class="nav-item" onclick="location.href='index.html'"><i class="fas fa-th-large"></i><span>Dashboard</span></button>
+  <button class="nav-item" onclick="location.href='sinistro.html'"><i class="fas fa-file-medical-alt"></i><span>Sinistro</span></button>
+  <button class="nav-item active"><i class="fas fa-clipboard-check"></i><span>Docs</span></button>
+  <button class="nav-item accent" onclick="location.href='analise-ia.html'"><i class="fas fa-robot"></i><span>IA</span></button>
+</nav>
+
+<script>
+function togglePhase(hdr) {
+  const body = hdr.closest('.phase-card').querySelector('.phase-body');
+  const chev = hdr.querySelector('.chevron');
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  chev.classList.toggle('open', !isOpen);
+  hdr.classList.toggle('open', !isOpen);
+}
+
+function setCond(btn, id, ans) {
+  btn.closest('.cond-row').querySelectorAll('.cond-b').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+  const el = document.getElementById(id);
+  el.style.display = 'block';
+  el.innerHTML = ans === 'yes'
+    ? '<button class="btn btn-outline btn-sm mt-8"><i class="fas fa-upload"></i>&nbsp;Enviar arquivo</button>'
+    : '<div class="alert alert-info mt-8" style="font-size:12px;margin-bottom:0"><i class="fas fa-check-circle"></i><div>Resposta negativa registrada. Use <a href="mensagens.html" style="font-weight:700">Mensagens</a> para informar a Addvalora por e-mail.</div></div>';
+}
+
+document.querySelectorAll('.f-chip').forEach(c => {
+  c.addEventListener('click', () => {
+    document.querySelectorAll('.f-chip').forEach(x => x.classList.remove('active'));
+    c.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>

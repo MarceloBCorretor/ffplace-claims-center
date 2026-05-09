@@ -1,0 +1,2 @@
+# Bloqueia listagem de diretório na pasta /api
+Options -Indexes
