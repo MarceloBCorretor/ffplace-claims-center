@@ -55,13 +55,27 @@ if ($hits >= $limit) {
 file_put_contents($rateFile, json_encode(['ts' => time(), 'hits' => $hits + 1]), LOCK_EX);
 
 // ─── Carregar chaves de API ───────────────────────────────────────────────────
-// Prioridade: variáveis de ambiente (Vercel) > _config/ai_keys.php
-$keysFile = __DIR__ . '/../_config/ai_keys.php';
-if (file_exists($keysFile)) {
-    require $keysFile;
-} else {
-    $AI_KEYS = [];
+// Prioridade 1: _config/anthropic_key.php na raiz do domínio (Hostinger)
+//               define('ANTHROPIC_API_KEY', 'sk-ant-...')
+// Prioridade 2: _config/ai_keys.php relativo ao projeto
+// Prioridade 3: variáveis de ambiente (Vercel)
+$AI_KEYS = [];
+
+$sharedKeyFile = ($_SERVER['DOCUMENT_ROOT'] ?? '') . '/_config/anthropic_key.php';
+if ($sharedKeyFile !== '/_config/anthropic_key.php' && file_exists($sharedKeyFile)) {
+    require_once $sharedKeyFile;
+    if (defined('ANTHROPIC_API_KEY')) {
+        $AI_KEYS['anthropic'] = ANTHROPIC_API_KEY;
+    }
 }
+
+if (empty($AI_KEYS['anthropic'])) {
+    $keysFile = __DIR__ . '/../_config/ai_keys.php';
+    if (file_exists($keysFile)) {
+        require $keysFile;
+    }
+}
+
 if (getenv('ANTHROPIC_KEY')) $AI_KEYS['anthropic'] = getenv('ANTHROPIC_KEY');
 if (getenv('OPENAI_KEY'))    $AI_KEYS['openai']    = getenv('OPENAI_KEY');
 if (getenv('DEEPSEEK_KEY'))  $AI_KEYS['deepseek']  = getenv('DEEPSEEK_KEY');
@@ -114,7 +128,7 @@ try {
 function callClaude(string $system, string $prompt, string $key): string
 {
     if (!$key) throw new Exception('Chave Anthropic não configurada');
-    $body = json_encode(['model'=>'claude-3-5-sonnet-20241022','max_tokens'=>1024,'system'=>$system,'messages'=>[['role'=>'user','content'=>$prompt]]]);
+    $body = json_encode(['model'=>'claude-sonnet-4-20250514','max_tokens'=>1024,'system'=>$system,'messages'=>[['role'=>'user','content'=>$prompt]]]);
     $res  = httpPost('https://api.anthropic.com/v1/messages', $body, ['x-api-key: '.$key,'anthropic-version: 2023-06-01','content-type: application/json']);
     $data = json_decode($res, true);
     $text = $data['content'][0]['text'] ?? null;
