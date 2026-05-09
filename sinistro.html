@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#003366">
+<title>FAI303306 — RCP Claims Center</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="assets/css/rcp-core.css">
+<style>
+/* Hero */
+.hero {
+  background: linear-gradient(135deg, var(--c-primary) 0%, #005299 100%);
+  color: white; border-radius: var(--r-lg);
+  padding: 18px 16px; margin: 14px 0;
+  position: relative; overflow: hidden;
+}
+.hero::after {
+  content: ''; position: absolute; top:-40px; right:-40px;
+  width:140px; height:140px; border-radius:50%;
+  background: rgba(255,255,255,0.04);
+}
+.hero-name     { font-size: 1.1rem; font-weight: 700; margin-bottom: 3px; }
+.hero-sub      { font-size: 13px; opacity: 0.78; margin-bottom: 12px; }
+.hero-tags     { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 14px; }
+.hero-tag {
+  padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 700;
+  background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25);
+}
+.hero-tag.urgent { background: rgba(185,28,28,0.8); border-color:transparent; }
+.hero-kpis     { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+.kpi-label     { font-size: 9px; text-transform:uppercase; letter-spacing:.05em; opacity:.6; margin-bottom:2px; }
+.kpi-value     { font-size: 13px; font-weight: 700; }
+.kpi-value.lg  { font-size: 1rem; }
+
+/* Quick actions */
+.quick-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 14px; }
+.quick-btn {
+  display:flex; flex-direction:column; align-items:center; gap:5px;
+  padding: 12px 6px; border-radius: var(--r);
+  background: var(--c-card); box-shadow: var(--sh);
+  font-size: 11px; font-weight: 700; color: var(--c-primary);
+  border: none; cursor: pointer; transition: all 0.2s;
+}
+.quick-btn i { font-size: 1.2rem; }
+.quick-btn:hover { transform: translateY(-2px); box-shadow: var(--sh-lg); }
+.quick-btn.wa  { color: #25d366; }
+.quick-btn.pdf { color: var(--c-accent); }
+.quick-btn.ai  { color: #7c3aed; }
+
+/* Info cards */
+.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.info-card {
+  background: var(--c-card); border-radius: var(--r);
+  padding: 13px 13px; box-shadow: var(--sh);
+  border-left: 4px solid var(--c-border);
+}
+.info-card.p { border-left-color: var(--c-primary); }
+.info-card.d { border-left-color: var(--c-danger); }
+.info-card.w { border-left-color: var(--c-warning); }
+.info-card.s { border-left-color: var(--c-success); }
+.ic-label { font-size: 0.62rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--c-muted); margin-bottom:4px; }
+.ic-value { font-size: 12px; font-weight:700; line-height:1.3; }
+.ic-sub   { font-size: 11px; color:var(--c-muted); margin-top:2px; }
+
+/* Tabs sticky */
+.tabs-sticky { position:sticky; top:62px; z-index:100; background:var(--c-bg); padding:8px 0 0; margin:0 -12px; padding-left:12px; }
+@media(min-width:768px){ .tabs-sticky { margin:0; } }
+
+/* Message card */
+.msg-card { background:var(--c-card); border-radius:var(--r); box-shadow:var(--sh); margin-bottom:12px; overflow:hidden; }
+.msg-head { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; border-bottom:1px solid var(--c-bg); }
+.msg-title { font-size:13px; font-weight:700; display:flex; align-items:center; gap:7px; }
+.msg-body  { padding:14px; font-size:13px; line-height:1.65; color:var(--c-text); white-space:pre-wrap; font-family:inherit; }
+.msg-foot  { padding:10px 14px; border-top:1px solid var(--c-bg); display:flex; gap:8px; flex-wrap:wrap; }
+
+/* Conditional toggle */
+.cond-wrap { background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:12px; margin-top:8px; }
+.cond-q    { font-size:12px; font-weight:600; color:#92400e; margin-bottom:8px; }
+.cond-btns { display:flex; gap:8px; }
+.cond-b    { flex:1; padding:7px; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; background:white; transition:all .15s; }
+.cond-b.yes{ border:2px solid #16a34a; color:#16a34a; }
+.cond-b.yes.sel{ background:#16a34a; color:white; }
+.cond-b.no { border:2px solid #dc2626; color:#dc2626; }
+.cond-b.no.sel { background:#dc2626; color:white; }
+.cond-result{ margin-top:10px; display:none; }
+
+/* Mini doc item */
+.doc-row { display:flex; align-items:flex-start; gap:10px; padding:12px 0; border-bottom:1px solid var(--c-bg); }
+.doc-row:last-child{ border-bottom:none; }
+.doc-ico  { font-size:15px; flex-shrink:0; margin-top:1px; }
+.doc-body { flex:1; min-width:0; }
+.doc-name { font-size:13px; font-weight:600; }
+.doc-meta { font-size:11px; color:var(--c-muted); margin-top:1px; line-height:1.4; }
+.doc-btns { display:flex; gap:5px; margin-top:7px; flex-wrap:wrap; }
+.doc-status{ flex-shrink:0; margin-top:2px; }
+
+/* AI panel */
+.ai-box { background:linear-gradient(135deg,#f3e8ff,#ede9fe); border:1px solid #c4b5fd; border-radius:var(--r-lg); padding:18px; margin-bottom:12px; }
+.ai-title{ font-size:14px; font-weight:700; color:#5b21b6; margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+.ai-body { background:white; border-radius:8px; padding:14px; font-size:13px; line-height:1.75; color:var(--c-text); min-height:80px; }
+</style>
+</head>
+<body>
+
+<div class="app-layout">
+
+  <!-- SIDEBAR desktop -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">RCP <span>Claims</span> Center<br><small style="color:rgba(255,255,255,.4);font-weight:400">Mar Del Plata Corretora</small></div>
+    <nav>
+      <a href="index.html"     class="nav-link"><i class="fas fa-th-large"></i> Dashboard</a>
+      <a href="sinistro.html"  class="nav-link active"><i class="fas fa-file-medical-alt"></i> Sinistros</a>
+      <a href="checklist.html" class="nav-link"><i class="fas fa-clipboard-check"></i> Documentos</a>
+      <a href="analise-ia.html" class="nav-link"><i class="fas fa-robot"></i> Análise IA</a>
+      <a href="mensagens.html" class="nav-link"><i class="fas fa-comments"></i> Mensagens</a>
+      <a href="documentos.html" class="nav-link"><i class="fas fa-file-pdf"></i> Gerar Docs</a>
+    </nav>
+    <div class="sidebar-footer">SUSEP 202031070<br>FFPlace · Fairfax Brasil</div>
+  </aside>
+
+  <div>
+    <!-- HEADER -->
+    <header class="app-header">
+      <div class="header-brand">
+        <button onclick="location.href='index.html'" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:white;width:34px;height:34px;border-radius:8px;font-size:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <div>
+          <div class="header-title">FAI303306 — Addvalora</div>
+          <div class="header-sub">Fairfax RC Profissional Médico</div>
+        </div>
+      </div>
+      <div class="header-badge" style="background:rgba(185,28,28,.8);border-color:rgba(255,255,255,.2)">
+        <span class="priority-dot priority-alta"></span>Alta
+      </div>
+    </header>
+
+    <div class="container">
+
+      <!-- HERO -->
+      <div class="hero">
+        <div class="hero-name">Dr. Raymundo Nonato Almeida Junior</div>
+        <div class="hero-sub"><i class="fas fa-bone" style="margin-right:5px;opacity:.7"></i>Ortopedista &nbsp;·&nbsp; Cacoal, RO</div>
+        <div class="hero-tags">
+          <span class="hero-tag urgent"><i class="fas fa-gavel"></i>&nbsp;Audiência 07/05/2026</span>
+          <span class="hero-tag">RC Prof. Médico</span>
+          <span class="hero-tag">Fairfax FF Orbi</span>
+        </div>
+        <div class="hero-kpis">
+          <div><div class="kpi-label">Processo</div><div class="kpi-value" style="font-size:10px">7018395-37.2025</div></div>
+          <div><div class="kpi-label">Pleito Total</div><div class="kpi-value lg">R$ 1,78Mi</div></div>
+          <div><div class="kpi-label">Docs Fase 2</div><div class="kpi-value lg">2/11</div></div>
+        </div>
+      </div>
+
+      <!-- QUICK ACTIONS -->
+      <div class="quick-grid">
+        <button class="quick-btn wa" onclick="window.open('https://wa.me/5569981717774')">
+          <i class="fab fa-whatsapp"></i>WhatsApp
+        </button>
+        <button class="quick-btn" onclick="switchTab('docs')">
+          <i class="fas fa-clipboard-check"></i>Checklist
+        </button>
+        <button class="quick-btn pdf" onclick="location.href='documentos.html'">
+          <i class="fas fa-file-pdf"></i>Gerar PDF
+        </button>
+      </div>
+
+      <!-- TABS -->
+      <div class="tabs-sticky">
+        <div class="tabs" id="mainTabs">
+          <button class="tab-btn active" onclick="switchTab('resumo')"><i class="fas fa-file-alt"></i>&nbsp;Resumo</button>
+          <button class="tab-btn" onclick="switchTab('docs')">
+            <i class="fas fa-paperclip"></i>&nbsp;Documentos
+            <span class="badge badge-warning" style="margin-left:5px;font-size:9px;padding:2px 6px">9</span>
+          </button>
+          <button class="tab-btn" onclick="switchTab('ia')"><i class="fas fa-robot"></i>&nbsp;IA</button>
+          <button class="tab-btn" onclick="switchTab('msgs')"><i class="fas fa-comments"></i>&nbsp;Mensagens</button>
+        </div>
+      </div>
+
+      <!-- ────── TAB RESUMO ────── -->
+      <div class="tab-content active" id="tab-resumo">
+
+        <div class="alert alert-danger mt-12">
+          <i class="fas fa-exclamation-triangle"></i>
+          <div><strong>Audiência de conciliação realizada em 07/05/2026.</strong> Verificar resultado com escritório Cândido &amp; Henrique e atualizar status do processo.</div>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-card p">
+            <div class="ic-label"><i class="fas fa-file-contract"></i>&nbsp;Apólice</div>
+            <div class="ic-value">10078·····888</div>
+            <div class="ic-sub">RC Prof. Médico</div>
+          </div>
+          <div class="info-card d">
+            <div class="ic-label"><i class="fas fa-balance-scale"></i>&nbsp;Vara</div>
+            <div class="ic-value" style="font-size:11px">1ª Vara Cível Cacoal/RO</div>
+            <div class="ic-sub">Recl.: Izaias do Amaral</div>
+          </div>
+          <div class="info-card w">
+            <div class="ic-label"><i class="fas fa-building"></i>&nbsp;Reguladora</div>
+            <div class="ic-value">Addvalora Brasil</div>
+            <div class="ic-sub">Aline R. Lonardoni</div>
+          </div>
+          <div class="info-card p">
+            <div class="ic-label"><i class="fas fa-user-tie"></i>&nbsp;Defesa</div>
+            <div class="ic-value" style="font-size:11px">Cândido &amp; Henrique</div>
+            <div class="ic-sub">Dr. Cândido Ocampo</div>
+          </div>
+        </div>
+
+        <div class="card card-top">
+          <div class="card-title"><i class="fas fa-clipboard-list"></i>Detalhes da Ocorrência</div>
+          <div style="font-size:13px;line-height:1.8">
+            <strong>Procedimento:</strong> Osteossíntese de fêmur<br>
+            <strong>Data:</strong> 12/11/2024 &nbsp;·&nbsp; <strong>Local:</strong> Cacoal, RO<br>
+            <strong>Causa:</strong> 1160 — Não identificada<br>
+            <strong>Natureza:</strong> Ação Judicial Cível
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><i class="fas fa-stream"></i>Timeline</div>
+          <div class="timeline">
+            <div class="timeline-item"><div class="tl-dot done"></div><div class="tl-date">12/11/2024</div><div class="tl-title">Procedimento cirúrgico</div><div class="tl-desc">Osteossíntese de fêmur — Cacoal/RO</div></div>
+            <div class="timeline-item"><div class="tl-dot done"></div><div class="tl-date">2025</div><div class="tl-title">Ajuizamento da ação</div><div class="tl-desc">Processo nº 7018395-37.2025.8.22.0007</div></div>
+            <div class="timeline-item"><div class="tl-dot done"></div><div class="tl-date">07/05/2025</div><div class="tl-title">Aviso de sinistro aberto</div><div class="tl-desc">Addvalora acionada pela Fairfax</div></div>
+            <div class="timeline-item"><div class="tl-dot active"></div><div class="tl-date">Em andamento</div><div class="tl-title">Regulação Addvalora</div><div class="tl-desc">9 documentos pendentes de 11 solicitados</div></div>
+            <div class="timeline-item"><div class="tl-dot urgent"></div><div class="tl-date">07/05/2026</div><div class="tl-title">Audiência de conciliação</div><div class="tl-desc">1ª Vara Cível Cacoal/RO — Verificar resultado</div></div>
+          </div>
+        </div>
+
+      </div><!-- /tab-resumo -->
+
+      <!-- ────── TAB DOCUMENTOS ────── -->
+      <div class="tab-content" id="tab-docs">
+
+        <div class="alert alert-warning mt-12">
+          <i class="fas fa-exclamation-circle"></i>
+          <div>Reguladora <strong>Addvalora</strong> solicitou 11 documentos — <strong>9 pendentes.</strong> Encaminhar com urgência.</div>
+        </div>
+
+        <div class="card">
+          <div class="progress-label" style="margin-bottom:6px">
+            <span style="font-weight:700;font-size:13px">Fase 2 — Regulação Addvalora</span>
+            <span>2 / 11</span>
+          </div>
+          <div class="progress-wrap" style="margin-bottom:16px">
+            <div class="progress-fill" style="width:18%"></div>
+          </div>
+
+          <!-- 2.1 -->
+          <div class="doc-row">
+            <span class="doc-ico">✅</span>
+            <div class="doc-body">
+              <div class="doc-name">2.1 — Aviso de Sinistro</div>
+              <div class="doc-meta">Assinado com data do procedimento e citação</div>
+            </div>
+            <span class="doc-status"><span class="badge badge-success">OK</span></span>
+          </div>
+
+          <!-- 2.2 -->
+          <div class="doc-row">
+            <span class="doc-ico">⭕</span>
+            <div class="doc-body">
+              <div class="doc-name">2.2 — Decl. Inexistência de Outros Seguros</div>
+              <div class="doc-meta">Modelo Addvalora — assinatura obrigatória</div>
+              <div class="doc-btns">
+                <a href="documentos.html" class="btn btn-primary btn-sm"><i class="fas fa-pen"></i>&nbsp;Gerar e Assinar</a>
+              </div>
+            </div>
+            <span class="doc-status"><span class="badge badge-warning">Pend.</span></span>
+          </div>
+
+          <!-- 2.3 condicional -->
+          <div class="doc-row">
+            <span class="doc-ico">⚡</span>
+            <div class="doc-body">
+              <div class="doc-name">2.3 — Reclamação Extrajudicial do Terceiro</div>
+              <div class="doc-meta">SAC, Ouvidoria, WhatsApp, BO ou outro meio</div>
+              <div class="cond-wrap">
+                <div class="cond-q">Houve reclamação formal antes da ação judicial?</div>
+                <div class="cond-btns">
+                  <button class="cond-b yes" onclick="setCond(this,'cr-23','yes')">✅ Sim</button>
+                  <button class="cond-b no"  onclick="setCond(this,'cr-23','no')">❌ Não</button>
+                </div>
+                <div class="cond-result" id="cr-23"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2.4 -->
+          <div class="doc-row">
+            <span class="doc-ico">⭕</span>
+            <div class="doc-body">
+              <div class="doc-name">2.4 — Cópia Integral da Ação Judicial</div>
+              <div class="doc-meta">Proc. 7018395-37.2025.8.22.0007 — PDF completo</div>
+              <div class="doc-btns"><button class="btn btn-outline btn-sm"><i class="fas fa-upload"></i>&nbsp;Enviar</button></div>
+            </div>
+            <span class="doc-status"><span class="badge badge-warning">Pend.</span></span>
+          </div>
+
+          <!-- 2.5 condicional -->
+          <div class="doc-row">
+            <span class="doc-ico">⚡</span>
+            <div class="doc-body">
+              <div class="doc-name">2.5 — Proc. Administrativo (CRM/CFM)</div>
+              <div class="doc-meta">Há procedimento administrativo em curso?</div>
+              <div class="cond-wrap">
+                <div class="cond-q">Existe procedimento administrativo em curso contra o segurado?</div>
+                <div class="cond-btns">
+                  <button class="cond-b yes" onclick="setCond(this,'cr-25','yes')">✅ Sim</button>
+                  <button class="cond-b no"  onclick="setCond(this,'cr-25','no')">❌ Não</button>
+                </div>
+                <div class="cond-result" id="cr-25"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2.6 condicional -->
+          <div class="doc-row">
+            <span class="doc-ico">⚡</span>
+            <div class="doc-body">
+              <div class="doc-name">2.6 — Procedimento Criminal</div>
+              <div class="doc-meta">Notificação de inquérito ou processo criminal?</div>
+              <div class="cond-wrap">
+                <div class="cond-q">O segurado foi notificado de procedimento criminal?</div>
+                <div class="cond-btns">
+                  <button class="cond-b yes" onclick="setCond(this,'cr-26','yes')">✅ Sim</button>
+                  <button class="cond-b no"  onclick="setCond(this,'cr-26','no')">❌ Não</button>
+                </div>
+                <div class="cond-result" id="cr-26"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2.7 -->
+          <div class="doc-row">
+            <span class="doc-ico">⭕</span>
+            <div class="doc-body">
+              <div class="doc-name">2.7 — Cópia da Citação Recebida</div>
+              <div class="doc-meta">Exigido se algum dos itens 2.3, 2.5 ou 2.6 for positivo</div>
+              <div class="doc-btns"><button class="btn btn-outline btn-sm"><i class="fas fa-upload"></i>&nbsp;Enviar</button></div>
+            </div>
+            <span class="doc-status"><span class="badge badge-warning">Pend.</span></span>
+          </div>
+
+          <!-- 2.8 condicional -->
+          <div class="doc-row">
+            <span class="doc-ico">⚡</span>
+            <div class="doc-body">
+              <div class="doc-name">2.8 — Tratativas com Terceiro (WA / e-mail)</div>
+              <div class="doc-meta">Print ou exportação de conversas com o reclamante</div>
+              <div class="cond-wrap">
+                <div class="cond-q">Houve contato direto com Izaias do Amaral Silva?</div>
+                <div class="cond-btns">
+                  <button class="cond-b yes" onclick="setCond(this,'cr-28','yes')">✅ Sim</button>
+                  <button class="cond-b no"  onclick="setCond(this,'cr-28','no')">❌ Não</button>
+                </div>
+                <div class="cond-result" id="cr-28"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2.9 -->
+          <div class="doc-row">
+            <span class="doc-ico">⭕</span>
+            <div class="doc-body">
+              <div class="doc-name">2.9 — Documentos do Profissional</div>
+              <div class="doc-meta">CRM &nbsp;·&nbsp; Diplomas e Especialidades &nbsp;·&nbsp; Comp. de Endereço</div>
+              <div class="doc-btns">
+                <button class="btn btn-outline btn-sm"><i class="fas fa-id-card"></i>&nbsp;CRM</button>
+                <button class="btn btn-outline btn-sm"><i class="fas fa-graduation-cap"></i>&nbsp;Diploma</button>
+                <button class="btn btn-outline btn-sm"><i class="fas fa-home"></i>&nbsp;Endereço</button>
+              </div>
+            </div>
+            <span class="doc-status"><span class="badge badge-warning">0/3</span></span>
+          </div>
+
+          <!-- 2.10 crítico -->
+          <div class="doc-row">
+            <span class="doc-ico">⭕</span>
+            <div class="doc-body">
+              <div class="doc-name">2.10 — Prontuário Clínico Completo</div>
+              <div class="doc-meta">
+                Descritivo cirúrgico · Prescrições · Exames pré e pós-op<br>
+                <strong style="color:var(--c-danger)">⚠ Documento crítico para análise de cobertura</strong>
+              </div>
+              <div class="doc-btns"><button class="btn btn-primary btn-sm"><i class="fas fa-upload"></i>&nbsp;Enviar prontuário</button></div>
+            </div>
+            <span class="doc-status"><span class="badge badge-danger">Crítico</span></span>
+          </div>
+
+          <!-- 2.11 -->
+          <div class="doc-row">
+            <span class="doc-ico">⭕</span>
+            <div class="doc-body">
+              <div class="doc-name">2.11 — Exames de Imagem (pré e pós-op)</div>
+              <div class="doc-meta">Podem ser incluídos no prontuário ou enviados separadamente</div>
+              <div class="doc-btns"><button class="btn btn-outline btn-sm"><i class="fas fa-x-ray"></i>&nbsp;Enviar exames</button></div>
+            </div>
+            <span class="doc-status"><span class="badge badge-warning">Pend.</span></span>
+          </div>
+
+          <!-- Nota legal -->
+          <div style="margin-top:16px;padding:10px 12px;background:#f8f9fa;border-radius:7px;border:1px solid var(--c-border);font-size:11px;color:var(--c-muted);line-height:1.5">
+            <strong>Obs. legal Addvalora:</strong> Esta solicitação não vincula a Seguradora ao pagamento de indenização. O pagamento, se devido, ocorrerá após análise das cláusulas contratuais e documentação completa.
+          </div>
+        </div>
+
+        <a href="documentos.html" class="btn btn-accent btn-full" style="margin-bottom:14px">
+          <i class="fas fa-file-pdf"></i>&nbsp;Gerar Documentos Oficiais
+        </a>
+
+      </div><!-- /tab-docs -->
+
+      <!-- ────── TAB IA ────── -->
+      <div class="tab-content" id="tab-ia">
+
+        <div class="ai-box mt-12">
+          <div class="ai-title"><i class="fas fa-robot"></i>Análise Executiva — IA</div>
+          <div class="ai-body" id="aiBody">
+            <div style="text-align:center;color:var(--c-muted);padding:16px 0">
+              <i class="fas fa-robot" style="font-size:2rem;display:block;margin-bottom:10px;opacity:.25"></i>
+              Clique em <strong>Gerar Análise</strong> para o resumo executivo, avaliação de risco e recomendações deste sinistro.
+            </div>
+          </div>
+          <div class="btn-group mt-12">
+            <button class="btn btn-ai" onclick="gerarIA()">
+              <i class="fas fa-magic"></i>&nbsp;Gerar Análise
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="copiar('aiBody')">
+              <i class="fas fa-copy"></i>&nbsp;Copiar
+            </button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><i class="fas fa-exclamation-triangle"></i>Avaliação de Risco</div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+            <div style="background:#fef2f2;border:2px solid #fecaca;border-radius:50%;width:52px;height:52px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.4rem">🔴</div>
+            <div>
+              <div style="font-size:1rem;font-weight:700;color:var(--c-danger)">RISCO ALTO</div>
+              <div style="font-size:12px;color:var(--c-muted)">Calculado automaticamente</div>
+            </div>
+          </div>
+          <div style="font-size:13px;line-height:1.75">
+            ⚠️ <strong>Pleito:</strong> R$ 1.784.733,00 — valor elevado<br>
+            ⚖️ <strong>Processo:</strong> Ação judicial em curso<br>
+            📅 <strong>Audiência:</strong> Realizada em 07/05/2026<br>
+            📄 <strong>Documentação:</strong> 82% pendente — risco de prazo
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><i class="fas fa-tasks"></i>Ações Recomendadas</div>
+          <div style="font-size:13px;line-height:1.8">
+            <div class="flex-center gap-8" style="margin-bottom:10px;align-items:flex-start">
+              <span style="background:var(--c-danger);color:white;border-radius:50%;min-width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;margin-top:1px">1</span>
+              <span>Verificar resultado da audiência com o escritório Cândido &amp; Henrique</span>
+            </div>
+            <div class="flex-center gap-8" style="margin-bottom:10px;align-items:flex-start">
+              <span style="background:#d97706;color:white;border-radius:50%;min-width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;margin-top:1px">2</span>
+              <span>Enviar prontuário clínico completo à Addvalora (doc. 2.10 — crítico)</span>
+            </div>
+            <div class="flex-center gap-8" style="margin-bottom:10px;align-items:flex-start">
+              <span style="background:var(--c-primary);color:white;border-radius:50%;min-width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;margin-top:1px">3</span>
+              <span>Gerar e assinar Declaração de Inexistência de Outros Seguros (doc. 2.2)</span>
+            </div>
+            <div class="flex-center gap-8" style="align-items:flex-start">
+              <span style="background:var(--c-muted);color:white;border-radius:50%;min-width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;margin-top:1px">4</span>
+              <span>Responder itens condicionais 2.3, 2.5, 2.6 e 2.8 à Addvalora por e-mail</span>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /tab-ia -->
+
+      <!-- ────── TAB MENSAGENS ────── -->
+      <div class="tab-content" id="tab-msgs">
+
+        <!-- WA Segurado -->
+        <div class="msg-card mt-12">
+          <div class="msg-head">
+            <div class="msg-title" style="color:#25d366"><i class="fab fa-whatsapp"></i>WhatsApp — Segurado</div>
+            <button class="btn btn-ghost btn-sm" onclick="copiar('wa1')"><i class="fas fa-copy"></i></button>
+          </div>
+          <div class="msg-body" id="wa1">Olá, Dr. Raymundo! 👋
+
+Sou o Marcelo, da Mar Del Plata Corretora. Preciso da sua colaboração para o sinistro RCP junto à Fairfax.
+
+📋 *Cód. Sinistro:* FAI303306
+🏢 *Reguladora:* Addvalora Brasil
+
+A Addvalora solicitou os seguintes documentos com urgência:
+
+✅ Prontuário clínico completo (cirurgia + exames)
+✅ CRM, Diplomas e Comprovante de endereço
+✅ Cópia integral da ação judicial
+
+Por favor, confirme também:
+• Houve contato direto com o Sr. Izaias antes da ação? (WA, e-mail ou outro)
+• Há algum processo administrativo (CRM/CFM) em curso?
+
+Estou à disposição! 🤝
+Marcelo Brandão — Mar Del Plata Corretora</div>
+          <div class="msg-foot">
+            <a href="https://wa.me/5569981717774" target="_blank" class="btn btn-wa btn-sm"><i class="fab fa-whatsapp"></i>&nbsp;Enviar</a>
+            <button class="btn btn-outline btn-sm" onclick="copiar('wa1')"><i class="fas fa-copy"></i>&nbsp;Copiar</button>
+          </div>
+        </div>
+
+        <!-- Email Addvalora -->
+        <div class="msg-card">
+          <div class="msg-head">
+            <div class="msg-title" style="color:var(--c-primary)"><i class="fas fa-envelope"></i>&nbsp;E-mail — Addvalora</div>
+            <button class="btn btn-ghost btn-sm" onclick="copiar('em1')"><i class="fas fa-copy"></i></button>
+          </div>
+          <div class="msg-body" id="em1">Prezada Dra. Aline Rodrigues Lonardoni,
+
+Conforme solicitado, encaminhamos as informações referentes ao sinistro FAI303306:
+
+Referente ao item 3 (Reclamação Extrajudicial): informamos que não houve qualquer reclamação formal prévia por parte do Terceiro (Sr. Izaias do Amaral Silva) por SAC, Ouvidoria, WhatsApp, BO ou qualquer outro canal antes do ajuizamento da ação.
+
+[COMPLETAR: resposta dos itens 2.5 e 2.6 após confirmação com o segurado]
+
+Os demais documentos solicitados estão sendo providenciados e serão encaminhados em breve.
+
+Atenciosamente,
+Marcelo Brandão
+Mar Del Plata Corretora e Assessoria de Seguros Ltda.
+SUSEP: 202031070</div>
+          <div class="msg-foot">
+            <a href="mailto:alonardoni@addvaloraglobal.com?subject=Sinistro FAI303306 — Informações Solicitadas" class="btn btn-primary btn-sm"><i class="fas fa-envelope"></i>&nbsp;Abrir e-mail</a>
+            <button class="btn btn-outline btn-sm" onclick="copiar('em1')"><i class="fas fa-copy"></i>&nbsp;Copiar</button>
+          </div>
+        </div>
+
+        <!-- WA Advogado -->
+        <div class="msg-card">
+          <div class="msg-head">
+            <div class="msg-title" style="color:var(--c-primary)"><i class="fas fa-gavel"></i>&nbsp;WhatsApp — Cândido &amp; Henrique</div>
+            <button class="btn btn-ghost btn-sm" onclick="copiar('wa2')"><i class="fas fa-copy"></i></button>
+          </div>
+          <div class="msg-body" id="wa2">Olá, Dr. Cândido!
+
+Sou o Marcelo Brandão, da Mar Del Plata Corretora. Preciso de uma atualização sobre a audiência de conciliação do processo 7018395-37.2025.8.22.0007 (Dr. Raymundo Nonato) realizada em 07/05/2026.
+
+Poderia nos informar:
+1. Resultado da audiência — acordo ou sem acordo?
+2. Próxima movimentação prevista no processo?
+
+Aguardo retorno para atualizar o sinistro junto à Addvalora e à Fairfax.
+
+Obrigado!</div>
+          <div class="msg-foot">
+            <button class="btn btn-outline btn-sm" onclick="copiar('wa2')"><i class="fas fa-copy"></i>&nbsp;Copiar</button>
+          </div>
+        </div>
+
+      </div><!-- /tab-msgs -->
+
+    </div><!-- /container -->
+  </div><!-- /main -->
+</div><!-- /layout -->
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-item" onclick="location.href='index.html'"><i class="fas fa-th-large"></i><span>Dashboard</span></button>
+  <button class="nav-item active"><i class="fas fa-file-medical-alt"></i><span>Sinistro</span></button>
+  <button class="nav-item" onclick="switchTab('docs');scrollTo(0,0)"><i class="fas fa-clipboard-check"></i><span>Docs</span></button>
+  <button class="nav-item accent" onclick="switchTab('ia');scrollTo(0,0)"><i class="fas fa-robot"></i><span>IA</span></button>
+</nav>
+
+<script>
+const TAB_MAP = { resumo:0, docs:1, ia:2, msgs:3 };
+
+function switchTab(id) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id)?.classList.add('active');
+  document.querySelectorAll('.tab-btn')[TAB_MAP[id]]?.classList.add('active');
+}
+
+function setCond(btn, targetId, answer) {
+  btn.closest('.cond-btns').querySelectorAll('.cond-b').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+  const el = document.getElementById(targetId);
+  el.style.display = 'block';
+  el.innerHTML = answer === 'yes'
+    ? '<button class="btn btn-outline btn-sm mt-8"><i class="fas fa-upload"></i>&nbsp;Enviar arquivo</button>'
+    : '<div class="alert alert-info mt-8" style="font-size:12px"><i class="fas fa-check-circle"></i><div>Resposta negativa registrada. Use o template de e-mail em <strong>Mensagens</strong> para informar à Addvalora.</div></div>';
+}
+
+function copiar(id) {
+  const txt = document.getElementById(id)?.innerText;
+  if (!txt) return;
+  navigator.clipboard?.writeText(txt).then(() => mostrarToast('Copiado!')).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = txt; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    mostrarToast('Copiado!');
+  });
+}
+
+function mostrarToast(msg) {
+  let t = document.getElementById('toast');
+  if (!t) { t = document.createElement('div'); t.id='toast'; t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a2332;color:white;padding:8px 18px;border-radius:20px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.3)'; document.body.appendChild(t); }
+  t.textContent = msg; t.style.opacity = '1';
+  setTimeout(() => { t.style.opacity = '0'; }, 2000);
+}
+
+async function gerarIA() {
+  const el = document.getElementById('aiBody');
+  el.innerHTML = '<div style="text-align:center;padding:20px"><div class="spinner" style="width:32px;height:32px;margin:0 auto 10px"></div><div style="color:var(--c-muted);font-size:13px">Gerando análise...</div></div>';
+  await new Promise(r => setTimeout(r, 2000));
+  el.innerHTML = `
+    <p>Trata-se de sinistro de <strong>Responsabilidade Civil Profissional Médica (RCP)</strong> de alta complexidade. O paciente Izaias do Amaral Silva ajuizou ação cível (proc. 7018395-37.2025.8.22.0007 — 1ª Vara Cível de Cacoal/RO) contra o Dr. Raymundo Nonato Almeida Junior, alegando falha em cirurgia de osteossíntese de fêmur realizada em 12/11/2024.</p>
+    <br>
+    <p>O pleito indenizatório totaliza <strong>R$ 1.784.733,00</strong> a título de danos materiais e morais. A defesa técnica está a cargo do escritório Cândido &amp; Henrique. A audiência de conciliação foi designada para 07/05/2026, com resultado ainda a ser confirmado.</p>
+    <br>
+    <p><strong>Ponto crítico:</strong> 82% da documentação solicitada pela reguladora Addvalora permanece pendente, incluindo o prontuário clínico completo (doc. 2.10), que é determinante para a análise de cobertura pela Fairfax. Ação imediata recomendada.</p>`;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+{
+  "sinistros": [
+    {
+      "id": "RCP-2025-001",
+      "codigo_reguladora": "FAI303306",
+      "status": "em_regulacao",
+      "prioridade": "alta",
+      "data_abertura": "2025-05-07",
+      "segurado": {
+        "nome": "Raymundo Nonato Almeida Junior",
+        "tratamento": "Dr.",
+        "especialidade": "Ortopedista",
+        "cidade_uf": "Cacoal, RO"
+      },
+      "apolice": {
+        "numero_mascarado": "10078·····888",
+        "item": "205152",
+        "cobertura": "RC PROFISSIONAL_MÉDICO (FF Orbi)",
+        "seguradora": "Fairfax",
+        "corretor_nome": "Marcelo Brandão",
+        "corretor_susep": "202031070"
+      },
+      "ocorrencia": {
+        "data": "2024-11-12",
+        "hora": "09:00",
+        "tipo": "falha_profissional",
+        "procedimento": "Osteossíntese de fêmur",
+        "causa_codigo": "1160",
+        "causa_descricao": "Causa não identificada"
+      },
+      "processo": {
+        "numero": "7018395-37.2025.8.22.0007",
+        "vara": "1ª Vara Cível de Cacoal/RO",
+        "reclamante": "Izaias do Amaral Silva",
+        "advogado_defesa_escritorio": "Cândido & Henrique",
+        "advogado_defesa_nome": "Dr. Cândido Ocampo Fernandes",
+        "audiencia_data": "2026-05-07",
+        "audiencia_tipo": "conciliacao",
+        "audiencia_status": "realizada"
+      },
+      "financeiro": {
+        "estimativa_prejuizo": 1784733.00,
+        "moeda": "BRL"
+      },
+      "reguladora": {
+        "nome": "Addvalora Brasil Reguladora de Sinistros Ltda.",
+        "site": "addvaloraglobal.com.br",
+        "contato_nome": "Aline Rodrigues Lonardoni",
+        "contato_cargo": "Advogada/Reguladora de Sinistros"
+      },
+      "timeline": [
+        { "data": "2024-11-12", "evento": "Procedimento cirúrgico realizado", "tipo": "ocorrencia", "status": "done" },
+        { "data": "2025-01-01", "evento": "Ajuizamento da ação pelo reclamante", "tipo": "processo", "status": "done" },
+        { "data": "2025-05-07", "evento": "Abertura do aviso de sinistro", "tipo": "abertura", "status": "done" },
+        { "data": "2025-05-07", "evento": "Regulação Addvalora iniciada", "tipo": "regulacao", "status": "active" },
+        { "data": "2026-05-07", "evento": "Audiência de conciliação", "tipo": "audiencia", "status": "urgent" }
+      ],
+      "checklist": {
+        "fase_1": [
+          { "id": "f1_01", "doc": "Aviso de Sinistro preenchido e assinado", "status": "concluido", "gerado_em_sistema": true },
+          { "id": "f1_02", "doc": "Cópia da apólice vigente", "status": "pendente" },
+          { "id": "f1_03", "doc": "CRM / Registro Profissional", "status": "pendente" },
+          { "id": "f1_04", "doc": "Documentos pessoais (RG/CPF)", "status": "pendente" }
+        ],
+        "fase_2_addvalora": [
+          { "id": "f2_01", "doc": "Aviso de Sinistro — relato detalhado com datas", "status": "concluido", "gerado_em_sistema": true },
+          { "id": "f2_02", "doc": "Declaração de Inexistência de Outros Seguros", "status": "pendente", "gerado_em_sistema": true, "condicional": false },
+          { "id": "f2_03", "doc": "Reclamação formal extrajudicial do Terceiro", "status": "pendente", "condicional": true, "resposta": null },
+          { "id": "f2_04", "doc": "Cópia Integral da Ação Judicial", "status": "pendente", "condicional": false },
+          { "id": "f2_05", "doc": "Procedimento Administrativo em curso (CRM/CFM)", "status": "pendente", "condicional": true, "resposta": null },
+          { "id": "f2_06", "doc": "Procedimento Criminal — inquérito ou processo", "status": "pendente", "condicional": true, "resposta": null },
+          { "id": "f2_07", "doc": "Cópia da Citação Recebida", "status": "pendente", "condicional": false },
+          { "id": "f2_08", "doc": "Tratativas com Terceiro (WA/e-mail/outros)", "status": "pendente", "condicional": true, "resposta": null },
+          { "id": "f2_09", "doc": "Documentos do Profissional (CRM + Diplomas + Comp. Endereço)", "status": "pendente", "sub_itens": 3, "sub_concluidos": 0 },
+          { "id": "f2_10", "doc": "Prontuário Clínico Completo", "status": "pendente", "critico": true },
+          { "id": "f2_11", "doc": "Exames de Imagem pré e pós-operatório", "status": "pendente" }
+        ],
+        "fase_3": [
+          { "id": "f3_01", "doc": "Contestação judicial", "status": "pendente" },
+          { "id": "f3_02", "doc": "Laudo pericial médico", "status": "pendente" },
+          { "id": "f3_03", "doc": "Contra-laudo (se necessário)", "status": "nao_aplicavel" },
+          { "id": "f3_04", "doc": "Exames de imagem (raio-X, ressonância)", "status": "pendente" },
+          { "id": "f3_05", "doc": "Relatório de evolução pós-operatória", "status": "pendente" }
+        ],
+        "fase_4": [
+          { "id": "f4_01", "doc": "Sentença ou acordo homologado", "status": "pendente" },
+          { "id": "f4_02", "doc": "Comprovante de pagamento (se aplicável)", "status": "pendente" },
+          { "id": "f4_03", "doc": "Relatório final da reguladora Addvalora", "status": "pendente" }
+        ]
+      }
+    }
+  ]
+}
